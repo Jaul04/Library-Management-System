@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+
+    <link rel="stylesheet" href="home.css">
+
+    
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+<body>
+
+
+
+<nav class="navbar">
+
+    <div class="logo">
+        <i class="fa-solid fa-book-open"></i>
+        LibraryMS
+    </div>
+
+    <ul class="nav-links">
+
+        <li><a href="#" class="active">Home</a></li>
+
+        <li><a href="book.html">Books</a></li>
+
+        <li><a href="student.html
+            ">Students</a></li>
+
+        <li><a href="issue.html">Issue Book</a></li>
+
+        <li><a href="return.html">Return Book</a></li>
+
+        <li><a href="#contact">Contact</a></li>
+
+    </ul>
+
+    <div class="nav-icons">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <a href="/login">
+            <i class="fa-solid fa-user"></i>
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>Welcome To <span>LibraryMS</span></h1>
+
+        <p>
+            Smart Library Management System for
+            Students, Librarians and Colleges.
+        </p>
+
+        <div class="hero-buttons">
+
+   <button class="btn-primary" onclick="window.location.href='/book.html'">
+    Explore Books
+</button>
+            <button class="btn-secondary">
+                Contact Us
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="search-section">
+
+    <h2>Search Books</h2>
+
+    <div class="search-bar">
+
+        <input
+        type="text"
+        placeholder="Search Books, Authors or Students">
+
+        <button>
+
+            <i class="fa fa-search"></i>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<section class="stats">
+
+    <div class="stat-box">
+
+        <i class="fa-solid fa-book fa-3x"></i>
+
+        <h2>150+</h2>
+
+        <p>Total Books</p>
+
+    </div>
+
+    <div class="stat-box">
+
+        <i class="fa-solid fa-user-graduate fa-3x"></i>
+
+        <h2>300+</h2>
+
+        <p>Students</p>
+
+    </div>
+
+    <div class="stat-box">
+
+        <i class="fa-solid fa-book-open-reader fa-3x"></i>
+
+        <h2>65+</h2>
+
+        <p>Issued Books</p>
+
+    </div>
+
+    <div class="stat-box">
+
+        <i class="fa-solid fa-arrow-rotate-left fa-3x"></i>
+
+        <h2>120+</h2>
+
+        <p>Returned</p>
+
+    </div>
+
+</section>
+
+
+<section class="featured-books">
+
+    <h2>Featured Books</h2>
+
+    <div class="books-container">
+
+        <div class="book-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-V-XjPyLMqn-z9tofTtbOJUG8fDjOhIfTtWWJmHzpVbzYEo2Zgy3sHoQ&s=10"">
+            
+            <h3>Java Programming</h3>
+            <p>Author : James Gosling</p>
+            <button>Read More</button>
+        </div>
+
+        <div class="book-card">
+            <img src="https://m.media-amazon.com/images/I/71cHGKNgKnL._AC_UF1000,1000_QL80_.jpg" alt="">
+            <h3>Python Programming</h3>
+            <p>Author : Guido van Rossum</p>
+            <button>Read More</button>
+        </div>
+
+        <div class="book-card">
+            <img src="https://ecampusontario.pressbooks.pub/app/uploads/sites/4483/2025/02/cover.jpg" alt="">
+            <h3>Web Development</h3>
+            <p>Author : John Duckett</p>
+            <button>Read More</button>
+        </div>
+
+        <div class="book-card">
+            <img src="https://m.media-amazon.com/images/I/61xYvZN9XyL._AC_UF1000,1000_QL80_.jpg" alt="">
+            <h3>Database System</h3>
+            <p>Author : Korth</p>
+            <button>Read More</button>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="services">
+
+    <h2>Library Services</h2>
+
+    <div class="service-container">
+
+        <div class="service-box">
+            <i class="fa-solid fa-book"></i>
+            <h3>Book Management</h3>
+            <p>Add, Update and Manage Books Easily.</p>
+        </div>
+
+        <div class="service-box">
+            <i class="fa-solid fa-user-graduate"></i>
+            <h3>Student Management</h3>
+            <p>Manage Student Records Efficiently.</p>
+        </div>
+
+        <div class="service-box">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <h3>Issue Books</h3>
+            <p>Issue Books in just one click.</p>
+        </div>
+
+        <div class="service-box">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+            <h3>Return Books</h3>
+            <p>Track Returned Books Easily.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="about">
+
+    <h2>About LibraryMS</h2>
+
+    <p>
+
+        LibraryMS is a smart Library Management System
+        developed using HTML, CSS, JavaScript,
+        Node.js, Express.js and MongoDB.
+
+        It helps students and librarians manage books,
+        students and issued books quickly and efficiently.
+
+    </p>
+
+</section>
+
+
+
+<section class="testimonials">
+
+    <h2>What Students Say</h2>
+
+    <div class="review">
+
+        <p>
+
+            "LibraryMS is very easy to use.
+            Managing books has never been easier."
+
+        </p>
+
+        <h4>- Rahul Sharma</h4>
+
+    </div>
+
+</section>
+
+
+
+<section class="contact" id="contact">
+
+    <h2>Contact Us</h2>
+
+    <form>
+
+        <input type="text" placeholder="Your Name">
+
+        <input type="email" placeholder="Email Address">
+
+        <textarea placeholder="Write Your Message"></textarea>
+
+        <button type="submit">Send Message</button>
+
+    </form>
+
+</section>
+
+
+
+<footer>
+
+    <div>
+
+        <h3>LibraryMS</h3>
+
+        <p>
+
+            Modern Library Management System
+
+        </p>
+
+    </div>
+
+    <div>
+
+        <h4>Quick Links</h4>
+
+        <a href="#">Home</a>
+
+        <a href="#">Books</a>
+
+        <a href="#">Students</a>
+
+        <a href="#">Contact</a>
+
+    </div>
+
+    <div>
+
+        <h4>Follow Us</h4>
+
+        <i class="fa-brands fa-facebook"></i>
+
+        <i class="fa-brands fa-instagram"></i>
+
+        <i class="fa-brands fa-linkedin"></i>
+
+        <i class="fa-brands fa-github"></i>
+
+    </div>
+
+</footer>
+
+
+
+<script src="home.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LibraryMS | Issue Book</title>
+
+    <link rel="stylesheet" href="issue.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-book-open"></i>
+
+            LibraryMS
+
+        </div>
+
+        <ul class="nav-links">
+
+            <li><a href="/home">Home</a></li>
+
+            <li><a href="/book.html">Books</a></li>
+
+            <li><a href="/student.html">Students</a></li>
+
+            <li><a href="/issue" class="active">Issue Book</a></li>
+
+            <li><a href="/return.html">Return Book</a></li>
+
+            <li><a href="/home#contact">Contact</a></li>
+
+        </ul>
+
+        <div class="nav-icons">
+
+            <a href="/login">
+
+                <i class="fa-solid fa-user"></i>
+
+            </a>
+
+        </div>
+
+    </nav>
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+
+                Issue <span>Book</span>
+
+            </h1>
+
+            <p>
+
+                Manage book issuing records quickly and efficiently.
+
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="issue-management">
+
+        <h2>
+
+            Issue Book Management
+
+        </h2>
+
+        <p>
+
+            Search, issue and manage all issued books.
+
+        </p>
+
+        <div class="issue-top">
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="searchIssue"
+                    placeholder="Search Student or Book">
+
+                <button>
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </button>
+
+            </div>
+
+            <select id="statusFilter">
+
+                <option value="all">
+
+                    All Status
+
+                </option>
+
+                <option value="Issued">
+
+                    Issued
+
+                </option>
+
+                <option value="Returned">
+
+                    Returned
+
+                </option>
+
+                <option value="Overdue">
+
+                    Overdue
+
+                </option>
+
+            </select>
+
+            <button
+                class="download-btn"
+                id="downloadIssue">
+
+                <i class="fa-solid fa-download"></i>
+
+                Download CSV
+
+            </button>
+
+            <button
+                class="issue-btn"
+                id="openIssueModal">
+
+                <i class="fa-solid fa-book"></i>
+
+                Issue Book
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <section class="issue-stats">
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-book-open"></i>
+
+        <h2 id="totalIssued">0</h2>
+
+        <p>Total Issued Books</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-calendar-day"></i>
+
+        <h2 id="dueToday">0</h2>
+
+        <p>Due Today</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <h2 id="overdueBooks">0</h2>
+
+        <p>Overdue Books</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-book"></i>
+
+        <h2 id="availableBooks">0</h2>
+
+        <p>Available Books</p>
+
+    </div>
+
+</section>
+
+<section class="issue-table-section">
+
+    <h2>Issued Books List</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Issue ID</th>
+
+                    <th>Student Name</th>
+
+                    <th>Book Name</th>
+
+                    <th>Issue Date</th>
+
+                    <th>Due Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="issueTableBody">
+
+                <tr>
+
+                    <td>IS101</td>
+
+                    <td>Rahul Patil</td>
+
+                    <td>Java Programming</td>
+
+                    <td>15-Jul-2026</td>
+
+                    <td>22-Jul-2026</td>
+
+                    <td>
+
+                        <span class="issued-status">
+
+                            Issued
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <button class="view-btn">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                        <button class="edit-btn">
+
+                            <i class="fa-solid fa-pen"></i>
+
+                        </button>
+
+                        <button class="delete-btn">
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>IS102</td>
+
+                    <td>Priya Sharma</td>
+
+                    <td>Database Management System</td>
+
+                    <td>16-Jul-2026</td>
+
+                    <td>23-Jul-2026</td>
+
+                    <td>
+
+                        <span class="issued-status">
+
+                            Issued
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <button class="view-btn">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                        <button class="edit-btn">
+
+                            <i class="fa-solid fa-pen"></i>
+
+                        </button>
+
+                        <button class="delete-btn">
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div>
+
+        <h3>LibraryMS</h3>
+
+        <p>
+
+            Smart Library Management System
+
+        </p>
+
+    </div>
+
+    <div>
+
+        <h4>Quick Links</h4>
+
+        <a href="/home">Home</a>
+
+        <a href="/book.html">Books</a>
+
+        <a href="/student.html">Students</a>
+
+        <a href="/issue">Issue Book</a>
+
+        <a href="/return.html">Return Book</a>
+
+    </div>
+
+    <div>
+
+        <h4>Follow Us</h4>
+
+        <i class="fa-brands fa-facebook"></i>
+
+        <i class="fa-brands fa-instagram"></i>
+
+        <i class="fa-brands fa-linkedin"></i>
+
+        <i class="fa-brands fa-github"></i>
+
+    </div>
+
+</footer>
+
+
+
+<div class="modal" id="issueModal">
+
+    <div class="modal-content">
+
+        <span class="close" id="closeIssue">&times;</span>
+
+        <h2>Issue New Book</h2>
+
+        <form id="issueForm">
+
+           <select id="studentSelect" required>
+
+    <option value="">Select Student</option>
+
+</select>
+
+            <select id="bookSelect" required>
+
+                <option value="">Select Book</option>
+
+            </select>
+
+            <input
+                type="date"
+                id="issueDate"
+                required>
+
+            <input
+                type="date"
+                id="dueDate"
+                required>
+
+            <button
+                type="submit"
+                class="save-btn">
+
+                Issue Book
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<div class="modal" id="viewModal">
+
+    <div class="modal-content">
+
+        <span class="close" id="closeView">&times;</span>
+
+        <h2>Issue Details</h2>
+
+        <p>
+
+            <strong>Issue ID :</strong>
+
+            <span id="viewIssueId"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Student :</strong>
+
+            <span id="viewStudent"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Book :</strong>
+
+            <span id="viewBook"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Issue Date :</strong>
+
+            <span id="viewIssueDate"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Due Date :</strong>
+
+            <span id="viewDueDate"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Status :</strong>
+
+            <span id="viewStatus"></span>
+
+        </p>
+
+    </div>
+
+</div>
+
+<script src="issue.js"></script>
+
+</body>
+
+</html>

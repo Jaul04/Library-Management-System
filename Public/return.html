@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LibraryMS | Return Book</title>
+
+    <link rel="stylesheet" href="return.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <i class="fa-solid fa-book-open"></i>
+
+        LibraryMS
+
+    </div>
+
+    <ul class="nav-links">
+
+        <li><a href="/home">Home</a></li>
+
+        <li><a href="/book.html">Books</a></li>
+
+        <li><a href="/student.html">Students</a></li>
+
+        <li><a href="/issue.html">Issue Book</a></li>
+
+        <li><a href="/return.html" class="active">Return Book</a></li>
+
+        <li><a href="/home#contact">Contact</a></li>
+
+    </ul>
+
+    <div class="nav-icons">
+
+        <a href="/login">
+
+            <i class="fa-solid fa-user"></i>
+
+        </a>
+
+    </div>
+
+</nav>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+
+            Return <span>Book</span>
+
+        </h1>
+
+        <p>
+
+            Manage all returned books with complete records.
+
+        </p>
+
+    </div>
+
+</section>
+
+<section class="return-management">
+
+    <h2>
+
+        Return Book Management
+
+    </h2>
+
+    <p>
+
+        Search and manage returned books easily.
+
+    </p>
+
+    <div class="return-top">
+
+        <div class="search-box">
+
+            <input
+            type="text"
+            id="searchReturn"
+            placeholder="Search Student or Book">
+
+            <button>
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+        </div>
+
+        <select id="statusFilter">
+
+            <option value="all">
+
+                All Status
+
+            </option>
+
+            <option value="Issued">
+
+                Issued
+
+            </option>
+
+            <option value="Returned">
+
+                Returned
+
+            </option>
+
+            <option value="Overdue">
+
+                Overdue
+
+            </option>
+
+        </select>
+
+        <button
+        class="download-btn"
+        id="downloadReturn">
+
+            <i class="fa-solid fa-download"></i>
+
+            Download CSV
+
+        </button>
+
+    </div>
+
+</section>
+
+<section class="return-stats">
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-book"></i>
+
+        <h2 id="returnedBooks">
+
+            0
+
+        </h2>
+
+        <p>
+
+            Returned Books
+
+        </p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-clock"></i>
+
+        <h2 id="pendingReturns">
+
+            0
+
+        </h2>
+
+        <p>
+
+            Pending Returns
+
+        </p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-calendar-day"></i>
+
+        <h2 id="todayReturns">
+
+            0
+
+        </h2>
+
+        <p>
+
+            Today's Returns
+
+        </p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-indian-rupee-sign"></i>
+
+        <h2 id="totalFine">
+
+            ₹0
+
+        </h2>
+
+        <p>
+
+            Total Fine
+
+        </p>
+
+    </div>
+
+</section>

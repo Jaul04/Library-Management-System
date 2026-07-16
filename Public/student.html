@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LibraryMS | Students</title>
+
+    <link rel="stylesheet" href="stud.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <i class="fa-solid fa-book-open"></i>
+            LibraryMS
+        </div>
+
+        <ul class="nav-links">
+
+            <li><a href="/home">Home</a></li>
+
+            <li><a href="/book.html">Books</a></li>
+
+            <li><a href="/student.html" class="active">Students</a></li>
+
+            <li><a href="/issue.html">Issue Book</a></li>
+
+            <li><a href="/return.html">Return Book</a></li>
+
+            <li><a href="/home#contact">Contact</a></li>
+
+        </ul>
+
+        <div class="nav-icons">
+
+            <a href="/login">
+                <i class="fa-solid fa-user"></i>
+            </a>
+
+        </div>
+
+    </nav>
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>Student <span>Management</span></h1>
+
+            <p>
+                Register and manage student information easily with LibraryMS.
+            </p>
+
+        </div>
+
+    </section>
+
+<section class="student-management">
+
+    <h2>Student Management</h2>
+
+    <p>
+        Manage all students efficiently. Search, add, edit and delete student records.
+    </p>
+
+    <div class="student-top">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchStudent"
+                placeholder="Search by Student Name or ID">
+
+            <button>
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+
+        </div>
+
+        <select id="departmentFilter">
+
+            <option value="All">All Departments</option>
+
+            <option value="Computer">Computer</option>
+
+            <option value="IT">IT</option>
+
+            <option value="ENTC">ENTC</option>
+
+            <option value="Mechanical">Mechanical</option>
+
+        </select>
+
+        <button class="download-btn" id="downloadStudents">
+
+            <i class="fa-solid fa-download"></i>
+
+            Download CSV
+
+        </button>
+
+        <button class="add-student-btn" id="openModal">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Add Student
+
+        </button>
+
+    </div>
+
+</section>
+
+    <section class="student-stats">
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-user-graduate"></i>
+
+        <h2 id="totalStudents">2</h2>
+
+        <p>Total Students</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <h2 id="activeStudents">2</h2>
+
+        <p>Active Students</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-book-open-reader"></i>
+
+        <h2 id="issuedStudents">1</h2>
+
+        <p>Books Issued</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <i class="fa-solid fa-building"></i>
+
+        <h2 id="departments">2</h2>
+
+        <p>Departments</p>
+
+    </div>
+
+</section>
+
+<section class="student-table-section">
+
+
+<h2>Student List</h2>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Student ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Department</th>
+<th>Year</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+<tbody id="studentTableBody">
+<tr>
+<td>ST101</td>
+<td>Rahul Patil</td>
+<td>rahul@gmail.com</td>
+<td>Computer</td>
+<td>FE</td>
+<td>
+<span class="active-status">
+Active
+</span>
+</td>
+<td>
+<button class="view-btn">
+👁
+</button>
+<button class="edit-btn">
+✏️
+</button>
+<button class="delete-btn">
+🗑️
+</button>
+</td>
+</tr>
+<tr>
+<td>ST102</td>
+<td>Priya Sharma</td>
+<td>priya@gmail.com</td>
+<td>IT</td>
+<td>SE</td>
+<td>
+<span class="active-status">
+Active
+</span>
+</td>
+<td>
+<button class="view-btn">
+👁
+</button>
+<button class="edit-btn">
+✏️
+</button>
+<button class="delete-btn">
+🗑️
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+
+    <section class="services">
+
+        <h2>Student Services</h2>
+
+        <div class="service-container">
+
+            <div class="service-box">
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                <h3>Registration</h3>
+
+                <p>
+                    Register new students with complete details.
+                </p>
+
+            </div>
+
+            <div class="service-box">
+
+                <i class="fa-solid fa-pen-to-square"></i>
+
+                <h3>Update Details</h3>
+
+                <p>
+                    Edit student information whenever required.
+                </p>
+
+            </div>
+
+            <div class="service-box">
+
+                <i class="fa-solid fa-book"></i>
+
+                <h3>Book History</h3>
+
+                <p>
+                    View issued and returned books.
+                </p>
+
+            </div>
+
+            <div class="service-box">
+
+                <i class="fa-solid fa-trash"></i>
+
+                <h3>Delete Student</h3>
+
+                <p>
+                    Remove inactive students from the system.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <footer>
+
+        <div>
+
+            <h3>LibraryMS</h3>
+
+            <p>
+                Smart Library Management System
+            </p>
+
+        </div>
+
+        <div>
+
+            <h4>Quick Links</h4>
+
+            <a href="/home">Home</a>
+
+            <a href="/books">Books</a>
+
+            <a href="/student">Students</a>
+
+            <a href="/home#contact">Contact</a>
+
+        </div>
+
+        <div>
+
+            <h4>Follow Us</h4>
+
+            <i class="fa-brands fa-facebook"></i>
+
+            <i class="fa-brands fa-instagram"></i>
+
+            <i class="fa-brands fa-linkedin"></i>
+
+            <i class="fa-brands fa-github"></i>
+
+        </div>
+
+<div class="modal" id="studentModal">
+
+    <div class="modal-content">
+
+        <span class="close">&times;</span>
+
+        <h2>Add New Student</h2>
+
+        <form id="studentForm">
+
+            <input type="text" id="studentId" placeholder="Student ID" required>
+
+            <input type="text" id="studentName" placeholder="Full Name" required>
+
+            <input type="email" id="studentEmail" placeholder="Email Address" required>
+
+            <input type="text" id="studentDepartment" placeholder="Department" required>
+
+            <input type="text" id="studentYear" placeholder="Year (FE / SE / TE / BE)" required>
+
+            <input type="text" id="studentMobile" placeholder="Mobile Number" required>
+
+            <button type="submit" class="save-btn">
+
+                Save Student
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+<div class="modal" id="viewModal">
+
+
+<div class="modal-content">
+
+
+<span class="close-view">
+&times;
+</span>
+
+
+<h2>
+Student Details
+</h2>
+
+
+
+<div class="student-details">
+
+
+<p>
+<b>Student ID:</b>
+<span id="viewId"></span>
+</p>
+
+
+<p>
+<b>Name:</b>
+<span id="viewName"></span>
+</p>
+
+
+
+<p>
+<b>Email:</b>
+<span id="viewEmail"></span>
+</p>
+
+
+
+<p>
+<b>Department:</b>
+<span id="viewDepartment"></span>
+</p>
+
+
+
+<p>
+<b>Year:</b>
+<span id="viewYear"></span>
+</p>
+
+
+
+<p>
+<b>Status:</b>
+Active
+</p>
+
+
+
+<p>
+<b>Books Issued:</b>
+2
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+    </footer>
+<script src="student.js"></script>
+
+</body>
+
+</html>
