@@ -134,7 +134,7 @@ app.get('/students', (req, res) => {
     res.sendFile(path.join(__dirname, 'Public/students.html'));
 });
 
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   try {
     console.log("✅ Signup request received");
     console.log("Data from form:", req.body);
@@ -160,7 +160,7 @@ app.post('/signup', async (req, res) => {
 });
 
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
