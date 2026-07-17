@@ -438,11 +438,3 @@ margin-top:10px;
 }
 
 }
-
-.hero-content{
-    background:rgba(255,255,255,.08);
-    backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.2);
-    padding:50px;
-    border-radius:25px;
-}
