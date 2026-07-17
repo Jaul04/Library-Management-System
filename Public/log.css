@@ -9,7 +9,40 @@ body{
     background:
     linear-gradient(135deg,#1b3b6f,#2575fc,#4facfe);
 }
+.hero{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:320px;
+    padding:40px 20px;
+}
 
+.hero-content{
+    max-width:900px;
+    width:100%;
+    text-align:center;
+    color:white;
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.2);
+    padding:50px;
+    border-radius:25px;
+}
+
+.hero-content h1{
+    font-size:65px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.hero-content span{
+    color:#FFD700;
+}
+
+.hero-content p{
+    font-size:28px;
+    line-height:1.6;
+}
 
 
 .navbar{
