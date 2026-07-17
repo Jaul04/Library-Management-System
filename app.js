@@ -554,6 +554,10 @@ app.get("/dashboard-data", async (req, res) => {
 
 });
 
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/Public/login.html");
+});
+
 
 const PORT = process.env.PORT || 8000;
 
