@@ -110,7 +110,7 @@
 
         <i class="fa-solid fa-book fa-3x"></i>
 
-        <h2>150+</h2>
+      <h2 id="totalBooks">0</h2>
 
         <p>Total Books</p>
 
@@ -120,7 +120,7 @@
 
         <i class="fa-solid fa-user-graduate fa-3x"></i>
 
-        <h2>300+</h2>
+        <h2 id="totalStudents">0</h2>
 
         <p>Students</p>
 
@@ -130,7 +130,7 @@
 
         <i class="fa-solid fa-book-open-reader fa-3x"></i>
 
-        <h2>65+</h2>
+        <h2 id="issuedBooks">0</h2>
 
         <p>Issued Books</p>
 
@@ -140,7 +140,7 @@
 
         <i class="fa-solid fa-arrow-rotate-left fa-3x"></i>
 
-        <h2>120+</h2>
+        <h2 id="returnedBooks">0</h2>
 
         <p>Returned</p>
 
@@ -270,17 +270,32 @@
 
     <h2>Contact Us</h2>
 
-    <form>
+  <form id="contactForm">
 
-        <input type="text" placeholder="Your Name">
+    <input
+    type="text"
+    id="contactName"
+    placeholder="Your Name"
+    required>
 
-        <input type="email" placeholder="Email Address">
+    <input
+    type="email"
+    id="contactEmail"
+    placeholder="Email Address"
+    required>
 
-        <textarea placeholder="Write Your Message"></textarea>
+    <textarea
+    id="contactMessage"
+    placeholder="Write Your Message"
+    required></textarea>
 
-        <button type="submit">Send Message</button>
+    <button type="submit">
 
-    </form>
+        Send Message
+
+    </button>
+
+</form>
 
 </section>
 
