@@ -131,6 +131,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+transporter.verify((error, success) => {
+    if (error) {
+        console.log("Email Error:", error);
+    } else {
+        console.log("Email Server is Ready");
+    }
+});
+
 async function sendDueDateReminder(){
 
     try{
