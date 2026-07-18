@@ -1018,12 +1018,9 @@ app.get("/", (req, res) => {
 });
 
 
-cron.schedule("* * * * *", async () => {
-
+cron.schedule("0 9 * * *", async () => {
     console.log("Running Daily Reminder...");
-
     await sendDueDateReminder();
-
 });
 
 console.log("Cron Job Started...");
