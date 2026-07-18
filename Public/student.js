@@ -122,23 +122,59 @@ modal.style.display="none";
 });
 
 
-document.addEventListener("click",function(e){
+document.addEventListener("click", async function(e){
 
 
 if(e.target.classList.contains("delete-btn")){
 
 
-    e.target.closest("tr").remove();
+    const row = e.target.closest("tr");
 
 
-    updateStats();
+    const studentId = row.children[0].innerText;
+
+
+    if(confirm("Delete this student?")){
+
+
+        const response = await fetch(
+            "/delete-student/" + studentId,
+            {
+                method:"DELETE"
+            }
+        );
+
+
+        const result = await response.json();
+
+
+
+        if(result.success){
+
+
+            alert("Student Deleted Successfully");
+
+
+            loadStudents();
+
+
+        }
+        else{
+
+
+            alert("Delete Failed");
+
+
+        }
+
+
+    }
 
 
 }
 
 
 });
-
 
 function updateStats(){
 
