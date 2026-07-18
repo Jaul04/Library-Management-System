@@ -118,6 +118,26 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
+const contactSchema = new mongoose.Schema({
+
+    name: String,
+
+    email: String,
+
+    message: String,
+
+    createdAt: {
+
+        type: Date,
+
+        default: Date.now
+
+    }
+
+});
+
+const Contact = mongoose.model("Contact", contactSchema);
+
 
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'Public/signup.html'));
@@ -540,6 +560,46 @@ app.get("/students-data", async (req,res)=>{
 
         res.status(500).json({
             message:err.message
+        });
+
+    }
+
+});
+
+app.post("/contact", async (req, res) => {
+
+    try {
+
+        const contact = new Contact({
+
+            name: req.body.name,
+
+            email: req.body.email,
+
+            message: req.body.message
+
+        });
+
+        await contact.save();
+
+        res.json({
+
+            success: true,
+
+            message: "Message Sent Successfully"
+
+        });
+
+    }
+
+    catch(err){
+
+        res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
         });
 
     }
