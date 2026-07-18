@@ -122,7 +122,6 @@ const issueSchema = new mongoose.Schema({
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
-
 const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
@@ -130,7 +129,10 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
 });
 
 transporter.verify((error, success) => {
@@ -140,7 +142,6 @@ transporter.verify((error, success) => {
         console.log("Brevo SMTP Ready");
     }
 });
-
 async function sendDueDateReminder(){
 
     try{
