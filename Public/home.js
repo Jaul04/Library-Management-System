@@ -32,3 +32,49 @@ async function loadDashboard() {
 }
 
 loadDashboard();
+
+const contactForm = document.getElementById("contactForm");
+
+contactForm.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const response = await fetch("/contact",{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify({
+
+            name:document.getElementById("contactName").value,
+
+            email:document.getElementById("contactEmail").value,
+
+            message:document.getElementById("contactMessage").value
+
+        })
+
+    });
+
+    const result = await response.json();
+
+    if(result.success){
+
+        alert("Message Sent Successfully");
+
+        contactForm.reset();
+
+    }
+
+    else{
+
+        alert(result.message);
+
+    }
+
+});
