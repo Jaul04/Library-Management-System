@@ -123,28 +123,41 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
-const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    family: 4
-});
+async function sendEmail(to, subject, text) {
+    try {
+        const response = await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "Library Management System",
+                    email: process.env.EMAIL_USER
+                },
+                to: [
+                    {
+                        email: to
+                    }
+                ],
+                subject: subject,
+                textContent: text
+            },
+            {
+                headers: {
+                    "accept": "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+            }
+        );
 
-transporter.verify((err) => {
-    if (err) {
-        console.log("SMTP VERIFY ERROR:", err);
-    } else {
-        console.log("Brevo SMTP Ready");
+        console.log("Email Sent:", response.data);
+
+    } catch (err) {
+        console.log(
+            "Brevo Error:",
+            err.response?.data || err.message
+        );
     }
-});
+}
 
 async function sendDueDateReminder(){
 
@@ -185,15 +198,9 @@ console.log("Issues:", issues);
         for(let issue of issues){
 
 
-            await transporter.sendMail({
-
-                from: process.env.EMAIL_USER,
-
-                to: issue.studentEmail,
-
-                subject:"Library Book Return Reminder",
-
-                text:
+            await sendEmail(
+    issue.studentEmail,
+    "Library Book Return Reminder",
 `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
@@ -202,8 +209,7 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-
-            });
+);
 
 
             console.log(
@@ -877,23 +883,16 @@ app.get("/test-email", async(req,res)=>{
 
     try{
 
-        await transporter.sendMail({
+        await sendEmail(
+    "ansarjaul555@gmail.com",
+    "Library Management System Test",
+    "Email notification working successfully."
+);
 
-            from: process.env.EMAIL_USER,
-
-            to: "ansarjaul555@gmail.com",
-
-            subject: "Library Management System Test",
-
-            text: "Email notification working successfully."
-
-        });
-
-
-        res.json({
-            success:true,
-            message:"Email Sent Successfully"
-        });
+res.json({
+    success: true,
+    message: "Email Sent Successfully"
+});
 
 
     }
