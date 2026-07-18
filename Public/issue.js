@@ -52,7 +52,7 @@ const book = bookSelect.value;
 const issueDate = document.getElementById("issueDate").value;
 const dueDate = document.getElementById("dueDate").value;
 
-// Validation
+
 if (!student || !book || !issueDate || !dueDate) {
     alert("Please fill all fields.");
     return;
@@ -60,6 +60,17 @@ if (!student || !book || !issueDate || !dueDate) {
 
 const studentId = studentSelect.selectedOptions[0].dataset.id;
 const bookId = bookSelect.selectedOptions[0].dataset.id;
+
+
+if (!student || !book || !issueDate || !dueDate) {
+    alert("Please fill all fields.");
+    return;
+}
+
+const studentId = studentSelect.selectedOptions[0].dataset.id;
+const bookId = bookSelect.selectedOptions[0].dataset.id;
+const bookTitle = bookSelect.value;
+const studentEmail = studentSelect.selectedOptions[0].dataset.email;
 
 
 
@@ -75,16 +86,23 @@ const bookId = bookSelect.selectedOptions[0].dataset.id;
                 "Content-Type":"application/json"
             },
 
-            body:JSON.stringify({
+            body: JSON.stringify({
 
-                studentId,
-                studentName:student,
-                bookId,
-                bookTitle:book,
-                issueDate,
-                dueDate
+    studentId,
 
-            })
+    studentName: student,
+
+    studentEmail,
+
+    bookId,
+
+    bookTitle,
+
+    issueDate,
+
+    dueDate
+
+})
 
         });
 
@@ -117,6 +135,7 @@ const bookId = bookSelect.selectedOptions[0].dataset.id;
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
             studentId,
             studentName: student,
@@ -125,6 +144,18 @@ const bookId = bookSelect.selectedOptions[0].dataset.id;
             issueDate,
             dueDate
         })
+
+       ,body: JSON.stringify({
+
+    studentId,
+    studentName: student,
+    studentEmail,
+    bookId,
+    bookTitle: book,
+    issueDate,
+    dueDate
+
+})
     });
 
     console.log("Status:", response.status);
@@ -246,9 +277,6 @@ document.addEventListener("click", function (e) {
     }
 
 });
-
-
-// 👇 Yaha paste karo DELETE CODE
 
 document.addEventListener("click", async function(e){
 
@@ -522,16 +550,16 @@ async function loadStudents() {
 
         students.forEach(student => {
 
-            studentSelect.innerHTML += `
-                <option
-    value="${student.name}"
-    data-id="${student.studentId}">
-    ${student.name}
+    studentSelect.innerHTML += `
+     <option
+value="${student.name}"
+data-id="${student.studentId}"
+data-email="${student.email}">
+${student.name}
 </option>
-            `;
+    `;
 
-        });
-
+});
     }
 
     catch(err){
