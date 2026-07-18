@@ -1,3 +1,4 @@
+console.log("Issue JS Loaded");
 const modal = document.getElementById("issueModal");
 
 const openModal = document.getElementById("openIssueModal");
@@ -51,10 +52,6 @@ const book = bookSelect.value;
 
 const issueDate = document.getElementById("issueDate").value;
 const dueDate = document.getElementById("dueDate").value;
-
-const studentId = studentSelect.selectedOptions[0].dataset.id;
-const bookId = bookSelect.selectedOptions[0].dataset.id;
-
 
 if (!student || !book || !issueDate || !dueDate) {
     alert("Please fill all fields.");
