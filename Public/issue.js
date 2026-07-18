@@ -223,6 +223,74 @@ document.addEventListener("click", function (e) {
     }
 
 });
+document.addEventListener("click", function (e) {
+
+    if (e.target.closest(".edit-btn")) {
+
+        editRow = e.target.closest("tr");
+
+        document.getElementById("studentSelect").value =
+            editRow.children[1].innerText;
+
+        document.getElementById("bookSelect").value =
+            editRow.children[2].innerText;
+
+        document.getElementById("issueDate").value =
+            editRow.children[3].innerText;
+
+        document.getElementById("dueDate").value =
+            editRow.children[4].innerText;
+
+        modal.style.display = "flex";
+
+    }
+
+});
+
+
+// 👇 Yaha paste karo DELETE CODE
+
+document.addEventListener("click", async function(e){
+
+    if(e.target.closest(".delete-btn")){
+
+        const row = e.target.closest("tr");
+
+        const id = row.children[0].innerText;
+
+
+        if(confirm("Delete this issue record?")){
+
+
+            const response = await fetch(
+                "/delete-issue/" + id,
+                {
+                    method:"DELETE"
+                }
+            );
+
+
+            const result = await response.json();
+
+
+            if(result.success){
+
+                alert("Issue Record Deleted Successfully");
+
+                loadIssuedBooks();
+
+            }
+            else{
+
+                alert("Delete Failed");
+
+            }
+
+        }
+
+    }
+
+});
 
 
 
