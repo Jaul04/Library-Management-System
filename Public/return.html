@@ -224,3 +224,85 @@
     </div>
 
 </section>
+<section class="return-table-section">
+
+    <h2>Returned Books List</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Issue ID</th>
+
+                    <th>Student</th>
+
+                    <th>Book</th>
+
+                    <th>Issue Date</th>
+
+                    <th>Due Date</th>
+
+                    <th>Return Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="returnTableBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+<div class="modal" id="returnModal">
+
+    <div class="modal-content">
+
+        <span class="close">&times;</span>
+
+        <h2>Return Book</h2>
+
+        <form id="returnForm">
+
+            <input type="text" id="issueId" readonly>
+
+            <input type="text" id="studentName" readonly>
+
+            <input type="text" id="bookName" readonly>
+
+            <input type="date" id="issueDate" readonly>
+
+            <input type="date" id="dueDate" readonly>
+
+            <input type="date" id="returnDate" required>
+
+            <input type="number" id="fine" readonly>
+
+            <button type="submit" class="return-btn">
+
+                Confirm Return
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+<script src="return.js"></script>
+
+</body>
+
+</html>
