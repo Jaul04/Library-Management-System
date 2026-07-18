@@ -122,26 +122,30 @@ const issueSchema = new mongoose.Schema({
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
+
 const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
+    requireTLS: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000
+    tls: {
+        rejectUnauthorized: false
+    },
+    family: 4
 });
 
-transporter.verify((error, success) => {
-    if (error) {
-        console.log("Email Error:", error);
+transporter.verify((err) => {
+    if (err) {
+        console.log("SMTP VERIFY ERROR:", err);
     } else {
         console.log("Brevo SMTP Ready");
     }
 });
+
 async function sendDueDateReminder(){
 
     try{
@@ -860,6 +864,13 @@ app.put("/update-issue/:id", async (req, res) => {
 
     }
 
+});
+
+app.get("/check-env", (req, res) => {
+    res.json({
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASS_EXISTS: !!process.env.EMAIL_PASS
+    });
 });
 
 app.get("/test-email", async(req,res)=>{
