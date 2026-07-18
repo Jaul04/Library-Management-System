@@ -1,3 +1,6 @@
+const cron = require("node-cron");
+const nodemailer = require("nodemailer");
+const axios = require("axios");
 require("dotenv").config();
 
 console.log("MONGO_URI =", process.env.MONGO_URI);
@@ -88,6 +91,8 @@ const issueSchema = new mongoose.Schema({
 
     studentName: String,
 
+     studentEmail: String,
+
     bookId: String,
 
     bookTitle: String,
@@ -118,6 +123,102 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
+const transporter = nodemailer.createTransport({
+
+    service: "gmail",
+
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+
+    tls: {
+        rejectUnauthorized: false
+    }
+
+});
+
+async function sendDueDateReminder(){
+
+    try{
+
+        const today = new Date();
+
+const reminderDate = new Date(today);
+
+reminderDate.setDate(today.getDate() + 2);
+
+
+reminderDate.setHours(0, 0, 0, 0);
+
+
+const nextDay = new Date(reminderDate);
+nextDay.setDate(nextDay.getDate() + 1);
+
+
+        const issues = await Issue.find({
+
+            status:"Issued",
+
+           dueDate: {
+    $gte: reminderDate,
+    $lt: nextDay
+}
+        });
+        console.log("Today's Date:", today);
+
+console.log("Reminder Date:", reminderDate);
+
+console.log("Total Issues Found:", issues.length);
+
+console.log("Issues:", issues);
+
+
+        for(let issue of issues){
+
+
+            await transporter.sendMail({
+
+                from: process.env.EMAIL_USER,
+
+                to: issue.studentEmail,
+
+                subject:"Library Book Return Reminder",
+
+                text:
+`Hello ${issue.studentName},
+
+Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
+
+Please return the book on time to avoid fine.
+
+Thank You
+LibraryMS`
+
+            });
+
+
+            console.log(
+                "Reminder sent to:",
+                issue.studentEmail
+            );
+
+
+        }
+
+
+    }
+    catch(err){
+
+        console.log(
+            "Reminder Error:",
+            err.message
+        );
+
+    }
+
+}
+
 const contactSchema = new mongoose.Schema({
 
     name: String,
@@ -135,6 +236,39 @@ const contactSchema = new mongoose.Schema({
     }
 
 });
+
+async function sendSMS(number,message){
+
+    try{
+
+        const response = await axios.post(
+            "https://www.fast2sms.com/dev/bulkV2",
+            {
+                route:"q",
+                message:message,
+                numbers:number
+            },
+            {
+                headers:{
+                    authorization:"Fcr3NKsQphfkTb2dzyCgZqBui7IRl9eDOGmJ6nvXSAH814tw0aXp8xealQ5KA6gwcikLNqumFOCtEU4B",
+                    "Content-Type":"application/json"
+                }
+            }
+        );
+
+
+        console.log(response.data);
+
+    }
+  catch(err){
+
+    console.log("SMS ERROR:");
+
+    console.log(err.response?.data);
+
+}
+
+}
 
 const Contact = mongoose.model("Contact", contactSchema);
 
@@ -719,6 +853,42 @@ app.put("/update-issue/:id", async (req, res) => {
 
 });
 
+app.get("/test-email", async(req,res)=>{
+
+    try{
+
+        await transporter.sendMail({
+
+            from: process.env.EMAIL_USER,
+
+            to: "ansarjaul555@gmail.com",
+
+            subject: "Library Management System Test",
+
+            text: "Email notification working successfully."
+
+        });
+
+
+        res.json({
+            success:true,
+            message:"Email Sent Successfully"
+        });
+
+
+    }
+    catch(err){
+
+        console.log("Email Error:",err);
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+});
 
 
 app.post("/contact", async (req, res) => {
@@ -815,10 +985,45 @@ app.get("/dashboard-data", async (req, res) => {
 
 });
 
+app.get("/test-sms",(req,res)=>{
+
+    sendSMS(
+        "YOUR_MOBILE_NUMBER",
+        "Library reminder: Your book due date is near."
+    );
+
+    res.send("SMS sent");
+
+});
+
+app.get("/send-reminders", async(req,res)=>{
+
+    await sendDueDateReminder();
+
+    res.json({
+
+        success:true,
+
+        message:"Reminder process completed"
+
+    });
+
+});
+
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/Public/login.html");
 });
 
+
+cron.schedule("* * * * *", async () => {
+
+    console.log("Running Daily Reminder...");
+
+    await sendDueDateReminder();
+
+});
+
+console.log("Cron Job Started...");
 
 const PORT = process.env.PORT || 8000;
 
