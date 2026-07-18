@@ -52,12 +52,6 @@ const book = bookSelect.value;
 const issueDate = document.getElementById("issueDate").value;
 const dueDate = document.getElementById("dueDate").value;
 
-
-if (!student || !book || !issueDate || !dueDate) {
-    alert("Please fill all fields.");
-    return;
-}
-
 const studentId = studentSelect.selectedOptions[0].dataset.id;
 const bookId = bookSelect.selectedOptions[0].dataset.id;
 
@@ -136,26 +130,16 @@ const studentEmail = studentSelect.selectedOptions[0].dataset.email;
             "Content-Type": "application/json"
         },
 
-        body: JSON.stringify({
-            studentId,
-            studentName: student,
-            bookId,
-            bookTitle: book,
-            issueDate,
-            dueDate
-        })
-
-       ,body: JSON.stringify({
-
+       body: JSON.stringify({
     studentId,
     studentName: student,
     studentEmail,
     bookId,
-    bookTitle: book,
+    bookTitle,
     issueDate,
     dueDate
-
 })
+    
     });
 
     console.log("Status:", response.status);
@@ -248,29 +232,6 @@ document.addEventListener("click", function (e) {
 
         document.querySelector(".save-btn").innerText =
             "Update Issue";
-
-        modal.style.display = "flex";
-
-    }
-
-});
-document.addEventListener("click", function (e) {
-
-    if (e.target.closest(".edit-btn")) {
-
-        editRow = e.target.closest("tr");
-
-        document.getElementById("studentSelect").value =
-            editRow.children[1].innerText;
-
-        document.getElementById("bookSelect").value =
-            editRow.children[2].innerText;
-
-        document.getElementById("issueDate").value =
-            editRow.children[3].innerText;
-
-        document.getElementById("dueDate").value =
-            editRow.children[4].innerText;
 
         modal.style.display = "flex";
 
