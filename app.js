@@ -589,30 +589,35 @@ app.post("/issue-book", async (req, res) => {
 
     try {
 
-        const issue = new Issue(req.body);
-
-        await issue.save();
-
         const book = await Book.findOne({
             bookId: req.body.bookId
         });
 
-        if (book) {
+        if (!book) {
 
-            if (book.available <= 0) {
-
-                return res.json({
-                    success: false,
-                    message: "Book not available"
-                });
-
-            }
-
-            book.available -= 1;
-
-            await book.save();
+            return res.json({
+                success: false,
+                message: "Book not found"
+            });
 
         }
+
+        if (book.available <= 0) {
+
+            return res.json({
+                success: false,
+                message: "Book not available"
+            });
+
+        }
+
+        const issue = new Issue(req.body);
+
+        await issue.save();
+
+        book.available--;
+
+        await book.save();
 
         res.json({
             success: true
