@@ -43,24 +43,23 @@ window.onclick = function (e) {
 form.addEventListener("submit", async function(e){
 
     e.preventDefault();
+const studentSelect = document.getElementById("studentSelect");
+const bookSelect = document.getElementById("bookSelect");
 
-    const student =
-    document.getElementById("studentSelect").value;
+const student = studentSelect.value;
+const book = bookSelect.value;
 
-    const book =
-    document.getElementById("bookSelect").value;
+const issueDate = document.getElementById("issueDate").value;
+const dueDate = document.getElementById("dueDate").value;
 
-    const issueDate =
-    document.getElementById("issueDate").value;
+// Validation
+if (!student || !book || !issueDate || !dueDate) {
+    alert("Please fill all fields.");
+    return;
+}
 
-    const dueDate =
-    document.getElementById("dueDate").value;
-
-    const studentId =
-    document.getElementById("studentSelect").selectedOptions[0].dataset.id;
-
-    const bookId =
-    document.getElementById("bookSelect").selectedOptions[0].dataset.id;
+const studentId = studentSelect.selectedOptions[0].dataset.id;
+const bookId = bookSelect.selectedOptions[0].dataset.id;
 
 
 
@@ -111,40 +110,52 @@ form.addEventListener("submit", async function(e){
 
 
 
-    const response = await fetch("/issue-book",{
+    try {
 
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/json"
+    const response = await fetch("/issue-book", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
         },
-
-        body:JSON.stringify({
-
+        body: JSON.stringify({
             studentId,
-            studentName:student,
+            studentName: student,
             bookId,
-            bookTitle:book,
+            bookTitle: book,
             issueDate,
             dueDate
-
         })
-
     });
+
+    console.log("Status:", response.status);
 
     const result = await response.json();
 
-    if(result.success){
+    console.log(result);
+
+    if (result.success) {
 
         alert("Book Issued Successfully");
 
-        modal.style.display="none";
+        modal.style.display = "none";
 
         form.reset();
 
         loadIssuedBooks();
 
+    } else {
+
+        alert(result.message || "Issue failed");
+
     }
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Server Error");
+
+}
 
 });
 
