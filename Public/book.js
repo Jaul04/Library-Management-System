@@ -37,30 +37,88 @@ function updateStats(){
 
 function attachEvents(row){
 
-    row.querySelector(".edit-btn").addEventListener("click",function(){
+
+    // EDIT BOOK
+
+    row.querySelector(".edit-btn")
+    .addEventListener("click",function(){
+
 
         editRow=row;
 
-        document.getElementById("bookId").value=row.cells[0].innerText;
-        document.getElementById("bookName").value=row.cells[1].innerText;
-        document.getElementById("author").value=row.cells[2].innerText;
-        document.getElementById("category").value=row.cells[3].innerText;
-        document.getElementById("quantity").value=row.cells[4].innerText;
+
+        document.getElementById("bookId").value =
+        row.cells[0].innerText;
+
+
+        document.getElementById("bookName").value =
+        row.cells[1].innerText;
+
+
+        document.getElementById("author").value =
+        row.cells[2].innerText;
+
+
+        document.getElementById("category").value =
+        row.cells[3].innerText;
+
+
+        document.getElementById("quantity").value =
+        row.cells[4].innerText;
+
 
         modal.style.display="flex";
 
+
     });
 
-    row.querySelector(".delete-btn").addEventListener("click",function(){
+
+
+    // DELETE BOOK
+
+    row.querySelector(".delete-btn")
+    .addEventListener("click",async function(){
+
 
         if(confirm("Delete this book?")){
 
-            row.remove();
-            updateStats();
+
+            const id=row.dataset.id;
+
+
+            const response=await fetch(
+                "/delete-book/"+id,
+                {
+                    method:"DELETE"
+                }
+            );
+
+
+            const result=await response.json();
+
+
+            if(result.success){
+
+
+                alert("Book Deleted Successfully");
+
+
+                loadBooks();
+
+
+            }
+            else{
+
+                alert("Delete Failed");
+
+            }
+
 
         }
 
+
     });
+
 
 }
 
@@ -103,6 +161,55 @@ bookForm.addEventListener("submit", async function(e){
 
     };
 console.log(book);
+    if(editRow){
+
+
+    const id = editRow.dataset.id;
+
+
+    const response = await fetch(
+        "/update-book/"+id,
+        {
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify(book)
+
+        });
+
+
+    const result = await response.json();
+
+
+    if(result.success){
+
+
+        alert("Book Updated Successfully");
+
+
+        modal.style.display="none";
+
+
+        bookForm.reset();
+
+
+        editRow=null;
+
+
+        loadBooks();
+
+
+    }
+
+
+    return;
+
+
+}
 
     const response = await fetch("/register-book", {   // 👈 YE LINE
         method: "POST",
@@ -339,7 +446,7 @@ async function loadBooks(){
 
         tbody.innerHTML+=`
 
-        <tr>
+        <tr data-id="${book._id}">
 
         <td>${book.bookId}</td>
 
@@ -382,6 +489,14 @@ async function loadBooks(){
         `;
 
     });
+
+      document.querySelectorAll("tbody tr")
+    .forEach(function(row){
+
+        attachEvents(row);
+
+    });
+
 
     updateStats();
 
