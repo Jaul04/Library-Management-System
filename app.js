@@ -124,24 +124,12 @@ const issueSchema = new mongoose.Schema({
 const Issue = mongoose.model("Issue", issueSchema);
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
-    family: 4,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000
-});
-
-transporter.verify((error, success) => {
-    if (error) {
-        console.log("Email Error:", error);
-    } else {
-        console.log("Email Server is Ready");
     }
 });
 
@@ -149,15 +137,7 @@ transporter.verify((error, success) => {
     if (error) {
         console.log("Email Error:", error);
     } else {
-        console.log("Email Server is Ready");
-    }
-});
-
-transporter.verify((error, success) => {
-    if (error) {
-        console.log("Email Error:", error);
-    } else {
-        console.log("Email Server is Ready");
+        console.log("Brevo SMTP Ready");
     }
 });
 
