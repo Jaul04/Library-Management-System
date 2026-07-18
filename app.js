@@ -285,6 +285,132 @@ app.get("/books-data", async (req, res) => {
 
 });
 
+
+app.put("/update-book/:id", async(req,res)=>{
+
+
+    try{
+
+
+        const book = await Book.findByIdAndUpdate(
+
+            req.params.id,
+
+            {
+
+                bookId:req.body.bookId,
+
+                title:req.body.title,
+
+                author:req.body.author,
+
+                category:req.body.category,
+
+                quantity:req.body.quantity,
+
+                available:req.body.available
+
+            },
+
+            {
+                new:true
+            }
+
+        );
+
+
+        if(!book){
+
+            return res.status(404).json({
+
+                success:false,
+
+                message:"Book not found"
+
+            });
+
+        }
+
+
+        res.json({
+
+            success:true,
+
+            message:"Book updated successfully",
+
+            book
+
+        });
+
+
+    }
+
+    catch(err){
+
+
+        console.log(err);
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+
+    }
+
+
+});
+
+app.delete("/delete-book/:id", async(req,res)=>{
+
+    try{
+
+        const book = await Book.findByIdAndDelete(req.params.id);
+
+
+        if(!book){
+
+            return res.status(404).json({
+
+                success:false,
+
+                message:"Book not found"
+
+            });
+
+        }
+
+
+        res.json({
+
+            success:true,
+
+            message:"Book deleted successfully"
+
+        });
+
+
+    }
+    catch(err){
+
+        console.log(err);
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+});
+
 app.post("/issue-book", async (req, res) => {
 
     try {
@@ -547,24 +673,6 @@ app.put("/update-issue/:id", async (req, res) => {
 });
 
 
-
-app.get("/students-data", async (req,res)=>{
-
-    try{
-
-        const students = await Student.find();
-
-        res.json(students);
-
-    }catch(err){
-
-        res.status(500).json({
-            message:err.message
-        });
-
-    }
-
-});
 
 app.post("/contact", async (req, res) => {
 
