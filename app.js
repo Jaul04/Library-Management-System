@@ -124,41 +124,33 @@ const issueSchema = new mongoose.Schema({
 const Issue = mongoose.model("Issue", issueSchema);
 
 async function sendEmail(to, subject, text) {
-    try {
-        const response = await axios.post(
-            "https://api.brevo.com/v3/smtp/email",
-            {
-                sender: {
-                    name: "Library Management System",
-                    email: process.env.EMAIL_USER
-                },
-                to: [
-                    {
-                        email: to
-                    }
-                ],
-                subject: subject,
-                textContent: text
+
+    const response = await axios.post(
+        "https://api.brevo.com/v3/smtp/email",
+        {
+            sender: {
+                name: "Library Management System",
+                email: process.env.EMAIL_USER
             },
-            {
-                headers: {
-                    "accept": "application/json",
-                    "api-key": process.env.BREVO_API_KEY,
-                    "content-type": "application/json"
+            to: [
+                {
+                    email: to
                 }
+            ],
+            subject: subject,
+            textContent: text
+        },
+        {
+            headers: {
+                accept: "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json"
             }
-        );
+        }
+    );
 
-        console.log("Email Sent:", response.data);
-
-    } catch (err) {
-        console.log(
-            "Brevo Error:",
-            err.response?.data || err.message
-        );
-    }
+    return response.data;
 }
-
 async function sendDueDateReminder(){
 
     try{
@@ -879,31 +871,23 @@ app.get("/check-env", (req, res) => {
     });
 });
 
-app.get("/test-email", async(req,res)=>{
+app.get("/test-email", async (req, res) => {
 
-    try{
+    try {
 
-        await sendEmail(
-    "ansarjaul555@gmail.com",
-    "Library Management System Test",
-    "Email notification working successfully."
-);
+        const result = await sendEmail(
+            "ansarjaul555@gmail.com",
+            "Library Management System Test",
+            "Email notification working successfully."
+        );
 
-res.json({
-    success: true,
-    message: "Email Sent Successfully"
-});
+        res.json(result);
 
+    } catch (err) {
 
-    }
-    catch(err){
-
-        console.log("Email Error:",err);
-
-        res.status(500).json({
-            success:false,
-            message:err.message
-        });
+        res.status(500).json(
+            err.response?.data || { error: err.message }
+        );
 
     }
 
