@@ -236,6 +236,53 @@ app.get("/students-data", async (req, res) => {
     }
 
 });
+app.delete("/delete-student/:id", async(req,res)=>{
+
+    try{
+
+        const student = await Student.findOneAndDelete({
+            studentId:req.params.id
+        });
+
+
+        if(!student){
+
+            return res.status(404).json({
+
+                success:false,
+
+                message:"Student not found"
+
+            });
+
+        }
+
+
+        res.json({
+
+            success:true,
+
+            message:"Student deleted successfully"
+
+        });
+
+
+    }
+    catch(err){
+
+        console.log(err);
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+});
 
 app.post("/register-book", async (req,res)=>{
 
