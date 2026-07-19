@@ -122,10 +122,11 @@ const issueSchema = new mongoose.Schema({
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
+
 async function sendEmail(to, subject, text) {
     try {
 
-        console.log("Sending email to:", to);
+        console.log(`Sending email to: ${to}`);
 
         const response = await axios.post(
             "https://api.brevo.com/v3/smtp/email",
@@ -150,7 +151,7 @@ async function sendEmail(to, subject, text) {
             }
         );
 
-        console.log("Brevo Response:", response.data);
+        console.log("Email sent successfully");
 
         return response.data;
 
@@ -158,65 +159,47 @@ async function sendEmail(to, subject, text) {
 
         console.log("Email Error:", err.response?.data || err.message);
 
+        return null;
     }
 }
 
-async function sendDueDateReminder(){
 
-    try{
+
+async function sendDueDateReminder() {
+
+    try {
 
         const today = new Date();
 
-const reminderDate = new Date(today);
+        const reminderDate = new Date(today);
+        reminderDate.setDate(today.getDate() + 2);
+        reminderDate.setHours(0, 0, 0, 0);
 
-reminderDate.setDate(today.getDate() + 2);
-
-
-reminderDate.setHours(0, 0, 0, 0);
-
-
-const nextDay = new Date(reminderDate);
-nextDay.setDate(nextDay.getDate() + 1);
-
+        const nextDay = new Date(reminderDate);
+        nextDay.setDate(nextDay.getDate() + 1);
 
         const issues = await Issue.find({
-
-            status:"Issued",
-
-           dueDate: {
-    $gte: reminderDate,
-    $lt: nextDay
-}
+            status: "Issued",
+            dueDate: {
+                $gte: reminderDate,
+                $lt: nextDay
+            }
         });
-        console.log("Today's Date:", today);
 
-console.log("Reminder Date:", reminderDate);
+        console.log(`Found ${issues.length} reminder(s)`);
 
-console.log("Total Issues Found:", issues.length);
-        console.log("Today:", today.toISOString());
-console.log("Reminder Date:", reminderDate.toISOString());
-console.log("Next Day:", nextDay.toISOString());
+        if (issues.length === 0) {
+            return;
+        }
 
-console.log("Issues Found:", issues.length);
+        for (const issue of issues) {
 
-if (issues.length > 0) {
-    console.log("Matched Due Date:", issues[0].dueDate.toISOString());
-}
+            try {
 
-
-       console.log("Issues Found:", issues.length);
-
-for (let issue of issues) {
-
-    console.log("---------------------");
-    console.log("Student:", issue.studentName);
-    console.log("Email:", issue.studentEmail);
-    console.log("Due Date:", issue.dueDate);
-
-    await sendEmail(
-        issue.studentEmail,
-        "Library Book Return Reminder",
-        `Hello ${issue.studentName},
+                await sendEmail(
+                    issue.studentEmail,
+                    "Library Book Return Reminder",
+                    `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
@@ -224,23 +207,24 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-    );
+                );
 
-    console.log("Email sent to:", issue.studentEmail);
+                console.log(`Reminder sent to ${issue.studentEmail}`);
+
+            } catch (err) {
+
+                console.log(`Failed to send email to ${issue.studentEmail}`);
+            }
+        }
+
+    } catch (err) {
+
+        console.log("Reminder Error:", err.message);
+
+    }
 }
 
 
-    }
-    catch(err){
-
-        console.log(
-            "Reminder Error:",
-            err.message
-        );
-
-    }
-
-}
 
 const contactSchema = new mongoose.Schema({
 
@@ -1014,12 +998,31 @@ app.get("/", (req, res) => {
 });
 
 
-cron.schedule("0 9 * * *", async () => {
-    console.log("Running Daily Reminder...");
-    await sendDueDateReminder();
-});
+cron.schedule(
+    "0 10 * * *",
+    async () => {
 
-console.log("Cron Job Started...");
+        console.log("Running Daily Reminder...");
+
+        try {
+
+            await sendDueDateReminder();
+
+            console.log("Daily Reminder Completed");
+
+        } catch (err) {
+
+            console.log("Cron Error:", err.message);
+
+        }
+
+    },
+    {
+        timezone: "Asia/Kolkata"
+    }
+);
+
+console.log("Cron Job Started (10:00 AM IST)");
 
 const PORT = process.env.PORT || 8000;
 
