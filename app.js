@@ -888,27 +888,6 @@ app.get("/check-env", (req, res) => {
     });
 });
 
-app.get("/test-email", async (req, res) => {
-
-    try {
-
-        const result = await sendEmail(
-            "boy626285@gmail.com",
-            "Library Management System Test",
-            "Email notification working successfully."
-        );
-
-        res.json(result);
-
-    } catch (err) {
-
-        res.status(500).json(
-            err.response?.data || { error: err.message }
-        );
-
-    }
-
-});
 
 
 app.post("/contact", async (req, res) => {
@@ -1035,7 +1014,7 @@ app.get("/", (req, res) => {
 });
 
 
-cron.schedule("0 * * * *", async () => {
+cron.schedule("0 9 * * *", async () => {
     console.log("Running Daily Reminder...");
     await sendDueDateReminder();
 });
