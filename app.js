@@ -123,23 +123,13 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
-const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_KEY
-    }
-});
-
 async function sendEmail(to, subject, text) {
 
     try {
 
         const info = await transporter.sendMail({
 
-           from: `"Library Management System" <${process.env.BREVO_SMTP_USER}>`,
+            from: `"Library Management System" <${process.env.EMAIL_USER}>`,
 
             to: to,
 
@@ -162,7 +152,6 @@ async function sendEmail(to, subject, text) {
     }
 
 }
-
 async function sendDueDateReminder(){
 
     try{
