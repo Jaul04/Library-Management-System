@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const cron = require("node-cron");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -998,29 +997,6 @@ app.get("/", (req, res) => {
 });
 
 
-cron.schedule(
-    "0 10 * * *",
-    async () => {
-
-        console.log("Running Daily Reminder...");
-
-        try {
-
-            await sendDueDateReminder();
-
-            console.log("Daily Reminder Completed");
-
-        } catch (err) {
-
-            console.log("Cron Error:", err.message);
-
-        }
-
-    },
-    {
-        timezone: "Asia/Kolkata"
-    }
-);
 
 console.log("Cron Job Started (10:00 AM IST)");
 
