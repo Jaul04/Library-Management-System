@@ -159,6 +159,11 @@ async function sendEmail(to, subject, text){
 
 
         console.log("Email Sent:", response.data);
+        console.log("Sending email to:", to);
+
+const response = await axios.post(...);
+
+console.log("Brevo Response:", response.data);
 
         return response.data;
 
@@ -209,6 +214,15 @@ console.log("Reminder Date:", reminderDate);
 console.log("Total Issues Found:", issues.length);
 
 console.log("Total Issues Found:", issues.length);
+        console.log("Today:", today.toISOString());
+console.log("Reminder Date:", reminderDate.toISOString());
+console.log("Next Day:", nextDay.toISOString());
+
+console.log("Issues Found:", issues.length);
+
+if (issues.length > 0) {
+    console.log("Matched Due Date:", issues[0].dueDate.toISOString());
+}
 
 
         for(let issue of issues){
