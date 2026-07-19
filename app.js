@@ -122,62 +122,43 @@ const issueSchema = new mongoose.Schema({
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
+async function sendEmail(to, subject, text) {
+    try {
 
-async function sendEmail(to, subject, text){
-
-    try{
-
-        const response = await axios.post(
-
-            "https://api.brevo.com/v3/smtp/email",
-
-            {
-                sender:{
-                    name:"Library Management System",
-                    email:process.env.EMAIL_USER
-                },
-
-                to:[
-                    {
-                        email:to
-                    }
-                ],
-
-                subject:subject,
-
-                textContent:text
-            },
-
-            {
-                headers:{
-                    "api-key":process.env.BREVO_API_KEY,
-                    "content-type":"application/json"
-                }
-            }
-
-        );
-
-
-        console.log("Email Sent:", response.data);
         console.log("Sending email to:", to);
 
-const response = await axios.post(...);
+        const response = await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "Library Management System",
+                    email: process.env.EMAIL_USER
+                },
+                to: [
+                    {
+                        email: to
+                    }
+                ],
+                subject: subject,
+                textContent: text
+            },
+            {
+                headers: {
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+            }
+        );
 
-console.log("Brevo Response:", response.data);
+        console.log("Brevo Response:", response.data);
 
         return response.data;
 
+    } catch (err) {
+
+        console.log("Email Error:", err.response?.data || err.message);
 
     }
-    catch(err){
-
-        console.log(
-            "Email Error:",
-            err.response?.data || err.message
-        );
-
-    }
-
 }
 
 async function sendDueDateReminder(){
@@ -210,8 +191,6 @@ nextDay.setDate(nextDay.getDate() + 1);
         console.log("Today's Date:", today);
 
 console.log("Reminder Date:", reminderDate);
-
-console.log("Total Issues Found:", issues.length);
 
 console.log("Total Issues Found:", issues.length);
         console.log("Today:", today.toISOString());
