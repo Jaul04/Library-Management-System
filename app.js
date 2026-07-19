@@ -123,34 +123,44 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
 async function sendEmail(to, subject, text) {
 
-    const response = await axios.post(
-        "https://api.brevo.com/v3/smtp/email",
-        {
-            sender: {
-                name: "Library Management System",
-                email: process.env.EMAIL_USER
-            },
-            to: [
-                {
-                    email: to
-                }
-            ],
-            subject: subject,
-            textContent: text
-        },
-        {
-            headers: {
-                accept: "application/json",
-                "api-key": process.env.BREVO_API_KEY,
-                "content-type": "application/json"
-            }
-        }
-    );
+    try {
 
-    return response.data;
+        const info = await transporter.sendMail({
+
+            from: `"Library Management System" <${process.env.EMAIL_USER}>`,
+
+            to: to,
+
+            subject: subject,
+
+            text: text
+
+        });
+
+        console.log("Email Sent:", info.messageId);
+
+        return info;
+
+    } catch (err) {
+
+        console.log("Email Error:", err);
+
+        throw err;
+
+    }
+
 }
+
 async function sendDueDateReminder(){
 
     try{
