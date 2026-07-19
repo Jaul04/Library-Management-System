@@ -139,7 +139,7 @@ async function sendEmail(to, subject, text) {
 
         const info = await transporter.sendMail({
 
-            from: `"Library Management System" <${process.env.EMAIL_USER}>`,
+           from: `"Library Management System" <${process.env.BREVO_SMTP_USER}>`,
 
             to: to,
 
