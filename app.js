@@ -204,13 +204,19 @@ if (issues.length > 0) {
 }
 
 
-        for(let issue of issues){
+       console.log("Issues Found:", issues.length);
 
+for (let issue of issues) {
 
-            await sendEmail(
-    issue.studentEmail,
-    "Library Book Return Reminder",
-`Hello ${issue.studentName},
+    console.log("---------------------");
+    console.log("Student:", issue.studentName);
+    console.log("Email:", issue.studentEmail);
+    console.log("Due Date:", issue.dueDate);
+
+    await sendEmail(
+        issue.studentEmail,
+        "Library Book Return Reminder",
+        `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
@@ -218,16 +224,10 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-);
+    );
 
-
-            console.log(
-                "Reminder sent to:",
-                issue.studentEmail
-            );
-
-
-        }
+    console.log("Email sent to:", issue.studentEmail);
+}
 
 
     }
