@@ -1,5 +1,5 @@
-const cron = require("node-cron");
 const nodemailer = require("nodemailer");
+const cron = require("node-cron");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -123,35 +123,58 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
-async function sendEmail(to, subject, text) {
+async function sendEmail(to, subject, text){
 
-    try {
+    try{
 
-        const info = await transporter.sendMail({
+        const response = await axios.post(
 
-            from: `"Library Management System" <${process.env.EMAIL_USER}>`,
+            "https://api.brevo.com/v3/smtp/email",
 
-            to: to,
+            {
+                sender:{
+                    name:"Library Management System",
+                    email:process.env.EMAIL_USER
+                },
 
-            subject: subject,
+                to:[
+                    {
+                        email:to
+                    }
+                ],
 
-            text: text
+                subject:subject,
 
-        });
+                textContent:text
+            },
 
-        console.log("Email Sent:", info.messageId);
+            {
+                headers:{
+                    "api-key":process.env.BREVO_API_KEY,
+                    "content-type":"application/json"
+                }
+            }
 
-        return info;
+        );
 
-    } catch (err) {
 
-        console.log("Email Error:", err);
+        console.log("Email Sent:", response.data);
 
-        throw err;
+        return response.data;
+
+
+    }
+    catch(err){
+
+        console.log(
+            "Email Error:",
+            err.response?.data || err.message
+        );
 
     }
 
 }
+
 async function sendDueDateReminder(){
 
     try{
