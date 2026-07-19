@@ -208,7 +208,7 @@ console.log("Reminder Date:", reminderDate);
 
 console.log("Total Issues Found:", issues.length);
 
-console.log("Issues:", issues);
+console.log("Total Issues Found:", issues.length);
 
 
         for(let issue of issues){
