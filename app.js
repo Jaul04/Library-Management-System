@@ -998,7 +998,7 @@ app.get("/", (req, res) => {
 
 
 
-console.log("Cron Job Started (10:00 AM IST)");
+console.log("Library Management System Started");
 
 const PORT = process.env.PORT || 8000;
 
