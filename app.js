@@ -995,14 +995,15 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/Public/login.html");
 });
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 9 * * *", async () => {
 
-    console.log("Testing reminder job...");
+    console.log("Running reminder job...");
 
     await sendDueDateReminder();
 
+}, {
+    timezone: "Asia/Kolkata"
 });
-
 console.log("Library Management System Started");
 
 const PORT = process.env.PORT || 8000;
