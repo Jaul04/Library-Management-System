@@ -168,18 +168,10 @@ async function sendDueDateReminder() {
 
     try {
 
-        const today = new Date();
+        const issues = await Issue.find({
+            status: "Issued"
+        });
 
-        const reminderDate = new Date(today);
-        reminderDate.setDate(today.getDate() + 2);
-        reminderDate.setHours(0, 0, 0, 0);
-
-        const nextDay = new Date(reminderDate);
-        nextDay.setDate(nextDay.getDate() + 1);
-
-       const issues = await Issue.find({
-    status: "Issued"
-});
         console.log(`Found ${issues.length} reminder(s)`);
 
         if (issues.length === 0) {
@@ -188,14 +180,16 @@ async function sendDueDateReminder() {
 
         for (const issue of issues) {
 
-    console.log("----------------------");
-    console.log("Student:", issue.studentName);
-    console.log("Book:", issue.bookTitle);
+            try {
 
-    await sendEmail(
-        issue.studentEmail,
-        "Library Book Return Reminder",
-        `Hello ${issue.studentName},
+                console.log("----------------------");
+                console.log("Student:", issue.studentName);
+                console.log("Book:", issue.bookTitle);
+
+                await sendEmail(
+                    issue.studentEmail,
+                    "Library Book Return Reminder",
+                    `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
@@ -203,23 +197,24 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-    );
+                );
 
-    console.log(`Reminder sent to ${issue.studentEmail}`);
-}
-    
-    catch (err) {
+                console.log(`Reminder sent to ${issue.studentEmail}`);
 
-        console.log(`Failed to send email to ${issue.studentEmail}`);
+            } catch (err) {
 
-    }
+                console.log(`Failed to send email to ${issue.studentEmail}`, err);
 
-}
+            }
+
+        }
+
     } catch (err) {
 
         console.log("Reminder Error:", err.message);
 
     }
+
 }
 
 
