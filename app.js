@@ -3,10 +3,6 @@ const nodemailer = require("nodemailer");
 const axios = require("axios");
 require("dotenv").config();
 
-
-console.log("MONGO_URI =", process.env.MONGO_URI);
-console.log("STUDENT_MONGO_URI =", process.env.STUDENT_MONGO_URI);
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
