@@ -177,38 +177,43 @@ async function sendDueDateReminder() {
         reminderDate.setDate(today.getDate() + 2);
         reminderDate.setHours(0, 0, 0, 0);
 
+
         const nextDay = new Date(reminderDate);
         nextDay.setDate(nextDay.getDate() + 1);
 
+
         const issues = await Issue.find({
 
-    status:"Issued",
+            status: "Issued",
 
-    reminderSent:false,
+            reminderSent: false,
 
-    dueDate:{
-        $gte: reminderDate,
-        $lt: nextDay
-    }
+            dueDate: {
+                $gte: reminderDate,
+                $lt: nextDay
+            }
 
-});
+        });
+
 
         console.log(`Found ${issues.length} reminder(s)`);
+
 
         if (issues.length === 0) {
             return;
         }
 
-       for (const issue of issues) {
 
-    console.log("----------------------");
-    console.log("Student:", issue.studentName);
-    console.log("Book:", issue.bookTitle);
+        for (const issue of issues) {
+
+            console.log("----------------------");
+            console.log("Student:", issue.studentName);
+            console.log("Book:", issue.bookTitle);
 
 
-    const emailResult = await sendEmail(
-        issue.studentEmail,
-        "Library Book Return Reminder",
+            const emailResult = await sendEmail(
+                issue.studentEmail,
+                "Library Book Return Reminder",
 `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
@@ -217,33 +222,34 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-    );
+            );
 
 
-    if(emailResult){
+            if (emailResult) {
 
-        issue.reminderSent = true;
+                issue.reminderSent = true;
 
-        await issue.save();
+                await issue.save();
 
-        console.log(`Reminder sent to ${issue.studentEmail}`);
+                console.log(`Reminder sent to ${issue.studentEmail}`);
+
+            }
+            else {
+
+                console.log(`Email failed for ${issue.studentEmail}`);
+
+            }
+
+        }
+
+
+    } catch (err) {
+
+        console.log("Reminder Error:", err);
 
     }
-    else{
-
-        console.log(`Email failed for ${issue.studentEmail}`);
-
-    }
 
 }
-        catch (err) {
-
-    console.log("Reminder Error:", err);
-
-}
-
-}
-
         
 const contactSchema = new mongoose.Schema({
 
