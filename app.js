@@ -193,15 +193,17 @@ async function sendDueDateReminder() {
 
         for (const issue of issues) {
 
-    console.log("------------------------");
-    console.log(issue);
-    console.log("Student :", issue.studentName);
-    console.log("Book :", issue.bookTitle);
+    try {
 
-    await sendEmail(
-        issue.studentEmail,
-        "Library Book Return Reminder",
-        `Hello ${issue.studentName},
+        console.log("------------------------");
+        console.log(issue);
+        console.log("Student :", issue.studentName);
+        console.log("Book :", issue.bookTitle);
+
+        await sendEmail(
+            issue.studentEmail,
+            "Library Book Return Reminder",
+            `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
@@ -209,15 +211,17 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-    );
+        );
 
-                console.log(`Reminder sent to ${issue.studentEmail}`);
+        console.log(`Reminder sent to ${issue.studentEmail}`);
 
-            } catch (err) {
+    } catch (err) {
 
-                console.log(`Failed to send email to ${issue.studentEmail}`);
-            }
-        }
+        console.log(`Failed to send email to ${issue.studentEmail}`, err);
+
+    }
+
+}
 
     } catch (err) {
 
