@@ -119,7 +119,11 @@ const issueSchema = new mongoose.Schema({
         default: "Issued"
 
     }
-
+reminderSent:{
+    type:Boolean,
+    default:false
+}
+    
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
@@ -180,12 +184,17 @@ async function sendDueDateReminder() {
         nextDay.setDate(nextDay.getDate() + 1);
 
         const issues = await Issue.find({
-            status: "Issued",
-            dueDate: {
-                $gte: reminderDate,
-                $lt: nextDay
-            }
-        });
+
+    status:"Issued",
+
+    reminderSent:false,
+
+    dueDate:{
+        $gte: reminderDate,
+        $lt: nextDay
+    }
+
+});
 
         console.log(`Found ${issues.length} reminder(s)`);
 
@@ -211,8 +220,12 @@ Please return the book on time to avoid fine.
 Thank You
 LibraryMS`
             );
+            issue.reminderSent = true;
+
+await issue.save();
 
             console.log(`Reminder sent to ${issue.studentEmail}`);
+            
         }
 
     } catch (err) {
