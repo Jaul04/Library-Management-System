@@ -195,11 +195,6 @@ async function sendDueDateReminder() {
 
     try {
 
-        console.log("------------------------");
-        console.log(issue);
-        console.log("Student :", issue.studentName);
-        console.log("Book :", issue.bookTitle);
-
         await sendEmail(
             issue.studentEmail,
             "Library Book Return Reminder",
@@ -217,12 +212,11 @@ LibraryMS`
 
     } catch (err) {
 
-        console.log(`Failed to send email to ${issue.studentEmail}`, err);
+        console.log(`Failed to send email to ${issue.studentEmail}`);
 
     }
 
 }
-
     } catch (err) {
 
         console.log("Reminder Error:", err.message);
