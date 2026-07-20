@@ -210,7 +210,6 @@ Please return the book on time to avoid fine.
 Thank You
 LibraryMS`
     );
-}
 
                 console.log(`Reminder sent to ${issue.studentEmail}`);
 
