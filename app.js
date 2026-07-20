@@ -177,14 +177,9 @@ async function sendDueDateReminder() {
         const nextDay = new Date(reminderDate);
         nextDay.setDate(nextDay.getDate() + 1);
 
-        const issues = await Issue.find({
-            status: "Issued",
-            dueDate: {
-                $gte: reminderDate,
-                $lt: nextDay
-            }
-        });
-
+       const issues = await Issue.find({
+    status: "Issued"
+});
         console.log(`Found ${issues.length} reminder(s)`);
 
         if (issues.length === 0) {
