@@ -199,15 +199,16 @@ async function sendDueDateReminder() {
             return;
         }
 
-        for (const issue of issues) {
+       for (const issue of issues) {
 
-            console.log("----------------------");
-            console.log("Student:", issue.studentName);
-            console.log("Book:", issue.bookTitle);
+    console.log("----------------------");
+    console.log("Student:", issue.studentName);
+    console.log("Book:", issue.bookTitle);
 
-            await sendEmail(
-                issue.studentEmail,
-                "Library Book Return Reminder",
+
+    const emailResult = await sendEmail(
+        issue.studentEmail,
+        "Library Book Return Reminder",
 `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
@@ -216,23 +217,25 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-            );
-            issue.reminderSent = true;
+    );
 
-await issue.save();
 
-            console.log(`Reminder sent to ${issue.studentEmail}`);
-            
-        }
+    if(emailResult){
 
-    } catch (err) {
+        issue.reminderSent = true;
 
-        console.log("Reminder Error:", err);
+        await issue.save();
+
+        console.log(`Reminder sent to ${issue.studentEmail}`);
+
+    }
+    else{
+
+        console.log(`Email failed for ${issue.studentEmail}`);
 
     }
 
 }
-
 
 const contactSchema = new mongoose.Schema({
 
