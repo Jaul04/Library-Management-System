@@ -995,9 +995,9 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/Public/login.html");
 });
 
-cron.schedule("0 9 * * *", async () => {
+cron.schedule("* * * * *", async () => {
 
-    console.log("Running reminder job...");
+    console.log("Testing reminder job...");
 
     await sendDueDateReminder();
 
