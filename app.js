@@ -236,7 +236,15 @@ LibraryMS`
     }
 
 }
+        catch (err) {
 
+    console.log("Reminder Error:", err);
+
+}
+
+}
+
+        
 const contactSchema = new mongoose.Schema({
 
     name: String,
