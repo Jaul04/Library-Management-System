@@ -168,13 +168,22 @@ async function sendDueDateReminder() {
 
     try {
 
+        const today = new Date();
+
+        const reminderDate = new Date(today);
+        reminderDate.setDate(today.getDate() + 2);
+        reminderDate.setHours(0, 0, 0, 0);
+
+        const nextDay = new Date(reminderDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+
         const issues = await Issue.find({
-    status: "Issued",
-    dueDate: {
-        $gte: reminderDate,
-        $lt: nextDay
-    }
-});
+            status: "Issued",
+            dueDate: {
+                $gte: reminderDate,
+                $lt: nextDay
+            }
+        });
 
         console.log(`Found ${issues.length} reminder(s)`);
 
@@ -184,16 +193,14 @@ async function sendDueDateReminder() {
 
         for (const issue of issues) {
 
-            try {
+            console.log("----------------------");
+            console.log("Student:", issue.studentName);
+            console.log("Book:", issue.bookTitle);
 
-                console.log("----------------------");
-                console.log("Student:", issue.studentName);
-                console.log("Book:", issue.bookTitle);
-
-                await sendEmail(
-                    issue.studentEmail,
-                    "Library Book Return Reminder",
-                    `Hello ${issue.studentName},
+            await sendEmail(
+                issue.studentEmail,
+                "Library Book Return Reminder",
+`Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
@@ -201,26 +208,18 @@ Please return the book on time to avoid fine.
 
 Thank You
 LibraryMS`
-                );
+            );
 
-                console.log(`Reminder sent to ${issue.studentEmail}`);
-
-            } catch (err) {
-
-                console.log(`Failed to send email to ${issue.studentEmail}`, err);
-
-            }
-
+            console.log(`Reminder sent to ${issue.studentEmail}`);
         }
 
     } catch (err) {
 
-        console.log("Reminder Error:", err.message);
+        console.log("Reminder Error:", err);
 
     }
 
 }
-
 
 
 const contactSchema = new mongoose.Schema({
