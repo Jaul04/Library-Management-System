@@ -1,6 +1,8 @@
+const cron = require("node-cron");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 require("dotenv").config();
+
 
 console.log("MONGO_URI =", process.env.MONGO_URI);
 console.log("STUDENT_MONGO_URI =", process.env.STUDENT_MONGO_URI);
@@ -993,7 +995,13 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/Public/login.html");
 });
 
+cron.schedule("0 9 * * *", async () => {
 
+    console.log("Running reminder job...");
+
+    await sendDueDateReminder();
+
+});
 
 console.log("Library Management System Started");
 
