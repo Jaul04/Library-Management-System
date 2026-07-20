@@ -118,7 +118,8 @@ const issueSchema = new mongoose.Schema({
 
         default: "Issued"
 
-    }
+    },
+        
 reminderSent:{
     type:Boolean,
     default:false
