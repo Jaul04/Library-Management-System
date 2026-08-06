@@ -690,3 +690,85 @@ footer{
 }
 
 }
+.menu-btn{
+
+    display:none;
+
+    color:white;
+
+    font-size:26px;
+
+    cursor:pointer;
+
+}
+
+
+
+@media(max-width:768px){
+
+
+.navbar{
+
+    position:relative;
+
+}
+
+
+
+.menu-btn{
+
+    display:block;
+
+}
+
+
+
+.nav-links{
+
+    display:none;
+
+    position:absolute;
+
+    top:70px;
+
+    left:0;
+
+    width:100%;
+
+    flex-direction:column;
+
+    background:#111827;
+
+    padding:20px;
+
+    z-index:999;
+
+}
+
+
+
+.nav-links.active{
+
+    display:flex;
+
+}
+
+
+
+.nav-icons{
+
+    display:none;
+
+}
+
+
+
+.nav-links li{
+
+    text-align:center;
+
+}
+
+
+
+}
