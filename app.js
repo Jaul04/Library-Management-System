@@ -1,126 +1,95 @@
 const cron = require("node-cron");
-const nodemailer = require("nodemailer");
 const axios = require("axios");
 require("dotenv").config();
 
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
-const session = require('express-session');
-const path = require('path');
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const path = require("path");
 
 const app = express();
 
-
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("Public")); 
-app.use(session({
-    secret: 'yourSecretKey',
-    resave: false,
-    saveUninitialized: true
-}));
+app.use(express.static("Public"));
 
-
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
-
-
-const studentDB = mongoose.createConnection(
-    process.env.STUDENT_MONGO_URI
+app.use(
+    session({
+        secret: "yourSecretKey",
+        resave: false,
+        saveUninitialized: false
+    })
 );
 
-studentDB.on('connected',()=>{
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB Connected"))
+    .catch((err) => console.log("MongoDB Error:", err.message));
+
+const studentDB = mongoose.createConnection(process.env.STUDENT_MONGO_URI);
+
+studentDB.on("connected", () => {
     console.log("Student Database Connected");
 });
 
+studentDB.on("error", (err) => {
+    console.log("Student DB Error:", err.message);
+});
 
 const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String
 });
-const User = mongoose.model('User', userSchema);
+
+const User = mongoose.model("User", userSchema);
 
 const studentSchema = new mongoose.Schema({
-
-    studentId:String,
-    name:String,
-    email:String,
-    mobile:String,
-    department:String,
-    year:String,
-    rollNo:String
-
+    studentId: String,
+    name: String,
+    email: String,
+    mobile: String,
+    department: String,
+    year: String,
+    rollNo: String
 });
 
-
-
-
-const Student = studentDB.model(
-    "Student",
-    studentSchema
-);
+const Student = studentDB.model("Student", studentSchema);
 
 const bookSchema = new mongoose.Schema({
-
     bookId: String,
-
     title: String,
-
     author: String,
-
     category: String,
-
     quantity: Number,
-
     available: Number
-
 });
 
 const Book = mongoose.model("Book", bookSchema);
 
 const issueSchema = new mongoose.Schema({
-
     studentId: String,
-
     studentName: String,
-
-     studentEmail: String,
-
+    studentEmail: String,
     bookId: String,
-
     bookTitle: String,
-
     issueDate: Date,
-
     dueDate: Date,
-
     returnDate: Date,
-
     fine: {
-
         type: Number,
-
         default: 0
-
     },
-
     status: {
-
         type: String,
-
         default: "Issued"
-
     },
-        
-reminderSent:{
-    type:Boolean,
-    default:false
-}
-    
+    reminderSent: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const Issue = mongoose.model("Issue", issueSchema);
@@ -128,9 +97,9 @@ const Issue = mongoose.model("Issue", issueSchema);
 async function sendEmail(to, subject, text) {
     try {
 
-        console.log(`Sending email to: ${to}`);
+        console.log(`Sending reminder to ${to}`);
 
-        const response = await axios.post(
+        await axios.post(
             "https://api.brevo.com/v3/smtp/email",
             {
                 sender: {
@@ -142,7 +111,7 @@ async function sendEmail(to, subject, text) {
                         email: to
                     }
                 ],
-                subject: subject,
+                subject,
                 textContent: text
             },
             {
@@ -153,19 +122,17 @@ async function sendEmail(to, subject, text) {
             }
         );
 
-        console.log("Email sent successfully");
+        console.log(`Email sent to ${to}`);
 
-        return response.data;
+        return true;
 
     } catch (err) {
 
-        console.log("Email Error:", err.response?.data || err.message);
+        console.log("Email Error:", err.message);
 
-        return null;
+        return false;
     }
 }
-
-
 
 async function sendDueDateReminder() {
 
@@ -177,208 +144,251 @@ async function sendDueDateReminder() {
         reminderDate.setDate(today.getDate() + 2);
         reminderDate.setHours(0, 0, 0, 0);
 
-
         const nextDay = new Date(reminderDate);
         nextDay.setDate(nextDay.getDate() + 1);
 
-
         const issues = await Issue.find({
-
             status: "Issued",
-
             reminderSent: false,
-
             dueDate: {
                 $gte: reminderDate,
                 $lt: nextDay
             }
-
         });
-
 
         console.log(`Found ${issues.length} reminder(s)`);
 
-
-        if (issues.length === 0) {
-            return;
-        }
-
+        let emailsSent = 0;
 
         for (const issue of issues) {
 
-            console.log("----------------------");
-            console.log("Student:", issue.studentName);
-            console.log("Book:", issue.bookTitle);
-
-
-            const emailResult = await sendEmail(
+            const success = await sendEmail(
                 issue.studentEmail,
                 "Library Book Return Reminder",
 `Hello ${issue.studentName},
 
 Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
-Please return the book on time to avoid fine.
+Please return the book before the due date to avoid a fine.
 
-Thank You
-LibraryMS`
+Thank You,
+Library Management System`
             );
 
-
-            if (emailResult) {
+            if (success) {
 
                 issue.reminderSent = true;
 
                 await issue.save();
 
+                emailsSent++;
+
                 console.log(`Reminder sent to ${issue.studentEmail}`);
 
-            }
-            else {
+            } else {
 
-                console.log(`Email failed for ${issue.studentEmail}`);
+                console.log(`Failed to send reminder to ${issue.studentEmail}`);
 
             }
 
         }
 
+        return {
+            total: issues.length,
+            emailsSent
+        };
 
     } catch (err) {
 
-        console.log("Reminder Error:", err);
+        console.log("Reminder Error:", err.message);
 
-    }
-
-}
-        
-const contactSchema = new mongoose.Schema({
-
+        return {
+            total: 0,
+            emailsSent: 0
+        };
+        const contactSchema = new mongoose.Schema({
     name: String,
-
     email: String,
-
     message: String,
-
     createdAt: {
-
         type: Date,
-
         default: Date.now
-
     }
-
 });
 
-async function sendSMS(number,message){
+const Contact = mongoose.model("Contact", contactSchema);
 
-    try{
+async function sendSMS(number, message) {
 
-        const response = await axios.post(
+    try {
+
+        await axios.post(
             "https://www.fast2sms.com/dev/bulkV2",
             {
-                route:"q",
-                message:message,
-                numbers:number
+                route: "q",
+                message,
+                numbers: number
             },
             {
-                headers:{
-                    authorization:"Fcr3NKsQphfkTb2dzyCgZqBui7IRl9eDOGmJ6nvXSAH814tw0aXp8xealQ5KA6gwcikLNqumFOCtEU4B",
-                    "Content-Type":"application/json"
+                headers: {
+                    authorization: process.env.FAST2SMS_API_KEY,
+                    "Content-Type": "application/json"
                 }
             }
         );
 
+        console.log(`SMS sent to ${number}`);
 
-        console.log(response.data);
+    } catch (err) {
+
+        console.log("SMS Error:", err.message);
 
     }
-  catch(err){
-
-    console.log("SMS ERROR:");
-
-    console.log(err.response?.data);
 
 }
 
-}
-
-const Contact = mongoose.model("Contact", contactSchema);
-
-
-app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public/signup.html'));
+app.get("/signup", (req, res) => {
+    res.sendFile(path.join(__dirname, "Public/signup.html"));
 });
 
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public/login.html'));
-});
-app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public/home.html'));
+app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "Public/login.html"));
 });
 
-app.get('/students', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public/students.html'));
+app.get("/home", (req, res) => {
+    res.sendFile(path.join(__dirname, "Public/home.html"));
 });
 
-app.post('/api/signup', async (req, res) => {
-  try {
-    console.log("✅ Signup request received");
-    console.log("Data from form:", req.body);
+app.get("/students", (req, res) => {
+    res.sendFile(path.join(__dirname, "Public/students.html"));
+});
 
-    const { username, email, password } = req.body;
+app.post("/api/signup", async (req, res) => {
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.log("⚠️ User already exists");
-      return res.send("User already exists");
+    try {
+
+        const { username, email, password } = req.body;
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+
+            return res.status(400).json({
+                success: false,
+                message: "User already exists"
+            });
+
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Signup successful"
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
-    await user.save();
-
-    console.log("✅ User inserted:", user);
-    res.send("Signup successful!");
-  } catch (err) {
-    console.error("❌ Error during signup:", err);
-    res.status(500).send("Server error");
-  }
 });
 
+app.post("/api/login", async (req, res) => {
 
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
+    try {
 
-    const user = await User.findOne({ email });
-    if (!user) return res.send("User not found");
+        const { email, password } = req.body;
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.send("Incorrect password");
+        const user = await User.findOne({ email });
 
-    req.session.userId = user._id;
-    res.send("Login successful!");
+        if (!user) {
+
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+
+            return res.status(401).json({
+                success: false,
+                message: "Incorrect password"
+            });
+
+        }
+
+        req.session.userId = user._id;
+
+        res.json({
+            success: true,
+            message: "Login successful"
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+
+    }
+
 });
 
 app.post("/register-student", async (req, res) => {
 
     try {
 
+        const existingStudent = await Student.findOne({
+            studentId: req.body.studentId
+        });
+
+        if (existingStudent) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Student already exists"
+            });
+
+        }
+
         const student = new Student(req.body);
 
         await student.save();
 
-        console.log("Student Added:", student);
-
         res.json({
-            success: true
+            success: true,
+            message: "Student registered successfully"
         });
 
     } catch (err) {
 
-        console.log(err);
+        console.log(err.message);
 
         res.status(500).json({
-            success: false
+            success: false,
+            message: err.message
         });
 
     }
@@ -389,89 +399,93 @@ app.get("/students-data", async (req, res) => {
 
     try {
 
-        const students = await Student.find();
+        const students = await Student.find().sort({
+            studentId: 1
+        });
 
         res.json(students);
 
     } catch (err) {
 
+        console.log(err.message);
+
         res.status(500).json({
+            success: false,
             message: err.message
         });
 
     }
 
 });
-app.delete("/delete-student/:id", async(req,res)=>{
 
-    try{
+app.delete("/delete-student/:id", async (req, res) => {
+
+    try {
 
         const student = await Student.findOneAndDelete({
-            studentId:req.params.id
+            studentId: req.params.id
         });
 
-
-        if(!student){
+        if (!student) {
 
             return res.status(404).json({
-
-                success:false,
-
-                message:"Student not found"
-
+                success: false,
+                message: "Student not found"
             });
 
         }
 
-
         res.json({
-
-            success:true,
-
-            message:"Student deleted successfully"
-
+            success: true,
+            message: "Student deleted successfully"
         });
 
+    } catch (err) {
 
-    }
-    catch(err){
-
-        console.log(err);
+        console.log(err.message);
 
         res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
+            success: false,
+            message: err.message
         });
 
     }
 
 });
 
-app.post("/register-book", async (req,res)=>{
+app.post("/register-book", async (req, res) => {
 
-    try{
+    try {
+
+        const existingBook = await Book.findOne({
+            bookId: req.body.bookId
+        });
+
+        if (existingBook) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Book ID already exists"
+            });
+
+        }
 
         const book = new Book(req.body);
 
         await book.save();
 
-        console.log("Book Added :",book);
-
         res.json({
-            success:true
+            success: true,
+            message: "Book added successfully"
         });
 
-    }
+    } catch (err) {
 
-    catch(err){
-
-        console.log(err);
+        console.log(err.message);
 
         res.status(500).json({
-            success:false
+            success: false,
+            message: err.message
         });
 
     }
@@ -482,15 +496,69 @@ app.get("/books-data", async (req, res) => {
 
     try {
 
-        const books = await Book.find();
+        const books = await Book.find().sort({
+            bookId: 1
+        });
 
         res.json(books);
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+});
+        app.put("/update-book/:id", async (req, res) => {
+
+    try {
+
+        const book = await Book.findByIdAndUpdate(
+
+            req.params.id,
+
+            {
+                bookId: req.body.bookId,
+                title: req.body.title,
+                author: req.body.author,
+                category: req.body.category,
+                quantity: req.body.quantity,
+                available: req.body.available
+            },
+
+            {
+                new: true,
+                runValidators: true
+            }
+
+        );
+
+        if (!book) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Book not found"
+            });
+
+        }
+
+        res.json({
+            success: true,
+            message: "Book updated successfully",
+            book
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            success: false,
             message: err.message
         });
 
@@ -498,126 +566,33 @@ app.get("/books-data", async (req, res) => {
 
 });
 
+app.delete("/delete-book/:id", async (req, res) => {
 
-app.put("/update-book/:id", async(req,res)=>{
-
-
-    try{
-
-
-        const book = await Book.findByIdAndUpdate(
-
-            req.params.id,
-
-            {
-
-                bookId:req.body.bookId,
-
-                title:req.body.title,
-
-                author:req.body.author,
-
-                category:req.body.category,
-
-                quantity:req.body.quantity,
-
-                available:req.body.available
-
-            },
-
-            {
-                new:true
-            }
-
-        );
-
-
-        if(!book){
-
-            return res.status(404).json({
-
-                success:false,
-
-                message:"Book not found"
-
-            });
-
-        }
-
-
-        res.json({
-
-            success:true,
-
-            message:"Book updated successfully",
-
-            book
-
-        });
-
-
-    }
-
-    catch(err){
-
-
-        console.log(err);
-
-
-        res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
-        });
-
-
-    }
-
-
-});
-
-app.delete("/delete-book/:id", async(req,res)=>{
-
-    try{
+    try {
 
         const book = await Book.findByIdAndDelete(req.params.id);
 
-
-        if(!book){
+        if (!book) {
 
             return res.status(404).json({
-
-                success:false,
-
-                message:"Book not found"
-
+                success: false,
+                message: "Book not found"
             });
 
         }
 
-
         res.json({
-
-            success:true,
-
-            message:"Book deleted successfully"
-
+            success: true,
+            message: "Book deleted successfully"
         });
 
+    } catch (err) {
 
-    }
-    catch(err){
-
-        console.log(err);
+        console.log(err.message);
 
         res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
+            success: false,
+            message: err.message
         });
 
     }
@@ -634,7 +609,7 @@ app.post("/issue-book", async (req, res) => {
 
         if (!book) {
 
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: "Book not found"
             });
@@ -643,14 +618,18 @@ app.post("/issue-book", async (req, res) => {
 
         if (book.available <= 0) {
 
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: "Book not available"
             });
 
         }
 
-        const issue = new Issue(req.body);
+        const issue = new Issue({
+            ...req.body,
+            reminderSent: false,
+            status: "Issued"
+        });
 
         await issue.save();
 
@@ -659,12 +638,13 @@ app.post("/issue-book", async (req, res) => {
         await book.save();
 
         res.json({
-            success: true
+            success: true,
+            message: "Book issued successfully"
         });
 
     } catch (err) {
 
-        console.log(err);
+        console.log(err.message);
 
         res.status(500).json({
             success: false,
@@ -679,18 +659,19 @@ app.get("/issued-books", async (req, res) => {
 
     try {
 
-        const issues = await Issue.find();
+        const issues = await Issue.find().sort({
+            issueDate: -1
+        });
 
         res.json(issues);
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
-
+            success: false,
             message: err.message
-
         });
 
     }
@@ -703,16 +684,24 @@ app.get("/issue/:id", async (req, res) => {
 
         const issue = await Issue.findById(req.params.id);
 
+        if (!issue) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Issue not found"
+            });
+
+        }
+
         res.json(issue);
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
-
+            success: false,
             message: err.message
-
         });
 
     }
@@ -728,51 +717,42 @@ app.put("/return-book/:id", async (req, res) => {
         if (!issue) {
 
             return res.status(404).json({
-
-                message: "Issue Not Found"
-
+                success: false,
+                message: "Issue not found"
             });
 
         }
 
         issue.returnDate = req.body.returnDate;
-
         issue.fine = req.body.fine;
-
         issue.status = "Returned";
 
         await issue.save();
 
         const book = await Book.findOne({
-
             bookId: issue.bookId
-
         });
 
         if (book) {
 
-            book.available += 1;
+            book.available++;
 
             await book.save();
 
         }
 
         res.json({
-
-            success: true
-
+            success: true,
+            message: "Book returned successfully"
         });
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
-
             success: false,
-
             message: err.message
-
         });
 
     }
@@ -783,24 +763,26 @@ app.get("/returned-books", async (req, res) => {
 
     try {
 
-        const issues = await Issue.find();
+        const issues = await Issue.find({
+            status: "Returned"
+        }).sort({
+            returnDate: -1
+        });
 
         res.json(issues);
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
-
+            success: false,
             message: err.message
-
         });
 
     }
 
 });
-
 
 app.delete("/delete-issue/:id", async (req, res) => {
 
@@ -811,32 +793,38 @@ app.delete("/delete-issue/:id", async (req, res) => {
         if (!issue) {
 
             return res.status(404).json({
-                success: false
+                success: false,
+                message: "Issue not found"
             });
 
         }
 
-        const book = await Book.findOne({
-            bookId: issue.bookId
-        });
+        if (issue.status === "Issued") {
 
-        if (book) {
+            const book = await Book.findOne({
+                bookId: issue.bookId
+            });
 
-            book.available += 1;
+            if (book) {
 
-            await book.save();
+                book.available++;
+
+                await book.save();
+
+            }
 
         }
 
         await Issue.findByIdAndDelete(req.params.id);
 
         res.json({
-            success: true
+            success: true,
+            message: "Issue deleted successfully"
         });
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
             success: false,
@@ -856,13 +844,15 @@ app.put("/update-issue/:id", async (req, res) => {
         if (!issue) {
 
             return res.status(404).json({
-                success: false
+                success: false,
+                message: "Issue not found"
             });
 
         }
 
         issue.studentId = req.body.studentId;
         issue.studentName = req.body.studentName;
+        issue.studentEmail = req.body.studentEmail;
         issue.bookId = req.body.bookId;
         issue.bookTitle = req.body.bookTitle;
         issue.issueDate = req.body.issueDate;
@@ -871,33 +861,30 @@ app.put("/update-issue/:id", async (req, res) => {
         await issue.save();
 
         res.json({
-            success: true
+            success: true,
+            message: "Issue updated successfully"
         });
 
-    }
+    } catch (err) {
 
-    catch (err) {
+        console.log(err.message);
 
         res.status(500).json({
-
             success: false,
-
             message: err.message
-
         });
 
     }
 
 });
+        app.get("/check-env", (req, res) => {
 
-app.get("/check-env", (req, res) => {
     res.json({
         EMAIL_USER: process.env.EMAIL_USER,
-        EMAIL_PASS_EXISTS: !!process.env.EMAIL_PASS
+        BREVO_API_KEY_EXISTS: !!process.env.BREVO_API_KEY
     });
+
 });
-
-
 
 app.post("/contact", async (req, res) => {
 
@@ -906,9 +893,7 @@ app.post("/contact", async (req, res) => {
         const contact = new Contact({
 
             name: req.body.name,
-
             email: req.body.email,
-
             message: req.body.message
 
         });
@@ -918,19 +903,17 @@ app.post("/contact", async (req, res) => {
         res.json({
 
             success: true,
-
-            message: "Message Sent Successfully"
+            message: "Message sent successfully"
 
         });
 
-    }
+    } catch (err) {
 
-    catch(err){
+        console.log(err.message);
 
         res.status(500).json({
 
             success: false,
-
             message: err.message
 
         });
@@ -948,11 +931,15 @@ app.get("/dashboard-data", async (req, res) => {
         const totalStudents = await Student.countDocuments();
 
         const issuedBooks = await Issue.countDocuments({
+
             status: "Issued"
+
         });
 
         const returnedBooks = await Issue.countDocuments({
+
             status: "Returned"
+
         });
 
         const books = await Book.find();
@@ -968,22 +955,67 @@ app.get("/dashboard-data", async (req, res) => {
         res.json({
 
             totalBooks,
-
             totalStudents,
-
             issuedBooks,
-
             returnedBooks,
-
             availableBooks
+
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+
+            success: false,
+            message: err.message
 
         });
 
     }
 
-    catch(err){
+});
+
+app.get("/test-sms", async (req, res) => {
+
+    await sendSMS(
+
+        "YOUR_MOBILE_NUMBER",
+
+        "Library reminder: Your book due date is near."
+
+    );
+
+    res.send("SMS sent");
+
+});
+
+app.get("/send-reminders", async (req, res) => {
+
+    try {
+
+        const result = await sendDueDateReminder();
+
+        res.json({
+
+            success: true,
+
+            message: "Reminder process completed",
+
+            totalIssues: result.total,
+
+            emailsSent: result.emailsSent
+
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
 
         res.status(500).json({
+
+            success: false,
 
             message: err.message
 
@@ -993,48 +1025,151 @@ app.get("/dashboard-data", async (req, res) => {
 
 });
 
-app.get("/test-sms",(req,res)=>{
-
-    sendSMS(
-        "YOUR_MOBILE_NUMBER",
-        "Library reminder: Your book due date is near."
-    );
-
-    res.send("SMS sent");
-
-});
-
-app.get("/send-reminders", async(req,res)=>{
-
-    await sendDueDateReminder();
-
-    res.json({
-
-        success:true,
-
-        message:"Reminder process completed"
-
-    });
-
-});
-
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/Public/login.html");
+
+    res.sendFile(path.join(__dirname, "Public/login.html"));
+
 });
 
-cron.schedule("0 9 * * *", async () => {
+cron.schedule(
 
-    console.log("Running reminder job...");
+    "0 9 * * *",
 
-    await sendDueDateReminder();
+    async () => {
 
-}, {
-    timezone: "Asia/Kolkata"
-});
+        console.log("Running Due Date Reminder Job...");
+
+        const result = await sendDueDateReminder();
+
+        console.log(
+            `Reminder Job Completed | Total: ${result.total} | Emails Sent: ${result.emailsSent}`
+        );
+
+    },
+
+    {
+
+        timezone: "Asia/Kolkata"
+
+    }
+
+);
+
 console.log("Library Management System Started");
 
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
+
     console.log(`Server running on port ${PORT}`);
+
 });
+        app.put("/return-book/:id", async (req, res) => {
+
+    try {
+
+        const issue = await Issue.findById(req.params.id);
+
+        if (!issue) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Issue not found"
+            });
+
+        }
+
+        issue.returnDate = req.body.returnDate;
+        issue.fine = req.body.fine;
+        issue.status = "Returned";
+        issue.reminderSent = false;
+
+        await issue.save();
+
+        const book = await Book.findOne({
+            bookId: issue.bookId
+        });
+
+        if (book) {
+
+            book.available++;
+
+            await book.save();
+
+        }
+
+        res.json({
+            success: true,
+            message: "Book returned successfully"
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+});
+
+app.get("/reset-reminders", async (req, res) => {
+
+    try {
+
+        const result = await Issue.updateMany(
+            {},
+            {
+                $set: {
+                    reminderSent: false
+                }
+            }
+        );
+
+        res.json({
+            success: true,
+            modified: result.modifiedCount
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+});
+
+app.get("/test-reminder", async (req, res) => {
+
+    try {
+
+        const result = await sendDueDateReminder();
+
+        res.json({
+            success: true,
+            result
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+});
+        
+
+    }
+
+}
