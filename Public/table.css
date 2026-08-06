@@ -1,0 +1,123 @@
+/* TABLE CONTAINER */
+
+.table-container{
+
+    width:100%;
+    overflow-x:auto;
+
+    margin-top:20px;
+
+}
+
+
+
+/* TABLE DESIGN */
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+    background:white;
+
+}
+
+
+
+table th{
+
+    background:#1b3b6f;
+
+    color:white;
+
+    padding:12px;
+
+    text-align:center;
+
+}
+
+
+
+table td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+
+
+table tr:hover{
+
+    background:#f5f7fb;
+
+}
+
+
+
+/* BUTTON DESIGN */
+
+table button{
+
+    padding:7px 12px;
+
+    border:none;
+
+    border-radius:5px;
+
+    cursor:pointer;
+
+    margin:3px;
+
+    font-size:13px;
+
+}
+
+
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+
+.table-container{
+
+    overflow-x:auto;
+
+}
+
+
+
+table{
+
+    min-width:800px;
+
+}
+
+
+
+table th,
+table td{
+
+    padding:8px;
+
+    font-size:13px;
+
+}
+
+
+
+table button{
+
+    padding:5px 8px;
+
+    font-size:12px;
+
+}
+
+
+
+}
