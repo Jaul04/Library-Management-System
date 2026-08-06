@@ -1,14 +1,20 @@
-const menuBtn = document.querySelector(".menu-btn");
+document.addEventListener("DOMContentLoaded",()=>{
 
-const navLinks = document.querySelector(".nav-links");
+
+const menuBtn=document.querySelector(".menu-btn");
+
+const navLinks=document.querySelector(".nav-links");
 
 
 if(menuBtn){
 
-    menuBtn.addEventListener("click",()=>{
+menuBtn.addEventListener("click",()=>{
 
-        navLinks.classList.toggle("active");
+navLinks.classList.toggle("active");
 
-    });
+});
 
 }
+
+
+});
