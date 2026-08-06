@@ -1,18 +1,22 @@
 document.addEventListener("DOMContentLoaded",()=>{
 
 
-const menuBtn=document.querySelector(".menu-btn");
+const menuBtn = document.querySelector(".menu-btn");
 
-const navLinks=document.querySelector(".nav-links");
+const navLinks = document.querySelector(".nav-links");
 
 
-if(menuBtn){
+if(menuBtn && navLinks){
+
 
 menuBtn.addEventListener("click",()=>{
 
+
 navLinks.classList.toggle("active");
 
+
 });
+
 
 }
 
