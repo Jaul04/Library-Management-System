@@ -78,3 +78,13 @@ contactForm.addEventListener("submit", async function(e){
     }
 
 });
+const menuBtn = document.querySelector(".menu-btn");
+
+const navLinks = document.querySelector(".nav-links");
+
+
+menuBtn.onclick = function(){
+
+    navLinks.classList.toggle("active");
+
+};
