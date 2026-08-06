@@ -211,3 +211,81 @@ nav{
 
 
 }
+.menu-btn{
+
+    display:none;
+    font-size:28px;
+    color:#1b3b6f;
+    cursor:pointer;
+
+}
+
+
+
+@media(max-width:768px){
+
+
+.navbar{
+
+    flex-direction:row;
+    position:relative;
+
+}
+
+
+.menu-btn{
+
+    display:block;
+
+}
+
+
+
+.nav-links{
+
+    display:none;
+
+    position:absolute;
+
+    top:70px;
+    left:0;
+
+    width:100%;
+
+    background:white;
+
+    flex-direction:column;
+
+    padding:20px;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.2);
+
+}
+
+
+
+.nav-links.active{
+
+    display:flex;
+
+}
+
+
+.nav-links li{
+
+    margin:10px 0;
+
+    text-align:center;
+
+}
+
+
+
+.nav-icons{
+
+    display:none;
+
+}
+
+
+}
