@@ -220,150 +220,134 @@ Create Account
 
 <script>
 
+// Password show/hide
 
 const password = document.getElementById("password");
-
 
 const toggle = document.getElementById("togglePassword");
 
 
-
 toggle.onclick = function(){
 
+    if(password.type === "password"){
 
-if(password.type === "password"){
+        password.type = "text";
 
+        toggle.innerHTML =
+        '<i class="fa-solid fa-eye-slash"></i>';
 
-password.type = "text";
+    }
 
+    else{
 
-toggle.innerHTML =
-'<i class="fa-solid fa-eye-slash"></i>';
+        password.type = "password";
 
+        toggle.innerHTML =
+        '<i class="fa-solid fa-eye"></i>';
 
-}
-
-else{
-
-
-password.type = "password";
-
-
-toggle.innerHTML =
-'<i class="fa-solid fa-eye"></i>';
-
-
-}
-
+    }
 
 };
 
 
 
-
-
+// Login Form Submit
 
 document
 .getElementById("loginForm")
 .addEventListener("submit", async function(e){
 
 
-e.preventDefault();
+    e.preventDefault();
+
+
+    const formData = new FormData(this);
+
+
+    const email = formData.get("email");
+
+    const password = formData.get("password");
 
 
 
-const formData = new FormData(this);
+    try{
+
+
+        const response = await fetch("/api/login",{
+
+
+            method:"POST",
+
+
+            headers:{
+
+
+                "Content-Type":
+                "application/x-www-form-urlencoded"
+
+
+            },
+
+
+            body:new URLSearchParams({
+
+
+                email:email,
+
+                password:password
+
+
+            })
+
+
+        });
 
 
 
-const email = formData.get("email");
-
-
-const password = formData.get("password");
+        const result = await response.json();
 
 
 
-
-try{
-
-
-const response = await fetch("/api/login",{
+        if(result.success){
 
 
-method:"POST",
+            alert("Login successful");
 
 
-headers:{
+            window.location.href="/home.html";
 
 
-"Content-Type":"application/x-www-form-urlencoded"
+        }
+
+        else{
 
 
-},
+            alert(result.message);
 
 
-body:new URLSearchParams({
-
-
-email:email,
-
-
-password:password
-
-
-})
-
-
-});
+        }
 
 
 
+    }
 
 
-const result = await response.json();
+    catch(error){
 
 
+        console.log(error);
 
 
-if(result.success){
+        alert("Something went wrong");
 
 
-window.location.href="/home";
-
-
-}
-
-else{
-
-
-alert(result.message);
-
-
-}
-
-
-
-}
-
-catch(error){
-
-
-console.log(error);
-
-
-alert("Login failed");
-
-
-}
+    }
 
 
 
 });
-
-
 
 </script>
-
 
 
 </body>
