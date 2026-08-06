@@ -17,7 +17,7 @@ app.use(express.static("Public"));
 
 app.use(
     session({
-        secret: "yourSecretKey",
+        secret: process.env.SESSION_SECRET || "librarymanagementsystem",
         resave: false,
         saveUninitialized: false
     })
@@ -26,7 +26,7 @@ app.use(
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.log("MongoDB Error:", err.message));
+    .catch((err) => console.log(err));
 
 const studentDB = mongoose.createConnection(process.env.STUDENT_MONGO_URI);
 
@@ -35,7 +35,7 @@ studentDB.on("connected", () => {
 });
 
 studentDB.on("error", (err) => {
-    console.log("Student DB Error:", err.message);
+    console.log(err);
 });
 
 const userSchema = new mongoose.Schema({
@@ -94,10 +94,21 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model("Issue", issueSchema);
 
-async function sendEmail(to, subject, text) {
-    try {
+const contactSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    message: String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
-        console.log(`Sending reminder to ${to}`);
+const Contact = mongoose.model("Contact", contactSchema);
+
+async function sendEmail(to, subject, text) {
+
+    try {
 
         await axios.post(
             "https://api.brevo.com/v3/smtp/email",
@@ -128,10 +139,12 @@ async function sendEmail(to, subject, text) {
 
     } catch (err) {
 
-        console.log("Email Error:", err.message);
+        console.log(err.response?.data || err.message);
 
         return false;
+
     }
+
 }
 
 async function sendDueDateReminder() {
@@ -141,38 +154,49 @@ async function sendDueDateReminder() {
         const today = new Date();
 
         const reminderDate = new Date(today);
+
         reminderDate.setDate(today.getDate() + 2);
+
         reminderDate.setHours(0, 0, 0, 0);
 
         const nextDay = new Date(reminderDate);
+
         nextDay.setDate(nextDay.getDate() + 1);
 
         const issues = await Issue.find({
+
             status: "Issued",
+
             reminderSent: false,
+
             dueDate: {
                 $gte: reminderDate,
                 $lt: nextDay
             }
+
         });
 
-        console.log(`Found ${issues.length} reminder(s)`);
+        console.log(`Found ${issues.length} reminders`);
 
         let emailsSent = 0;
 
         for (const issue of issues) {
 
             const success = await sendEmail(
+
                 issue.studentEmail,
+
                 "Library Book Return Reminder",
+
 `Hello ${issue.studentName},
 
-Your book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
+Your issued book "${issue.bookTitle}" is due on ${issue.dueDate.toDateString()}.
 
 Please return the book before the due date to avoid a fine.
 
 Thank You,
 Library Management System`
+
             );
 
             if (success) {
@@ -182,12 +206,6 @@ Library Management System`
                 await issue.save();
 
                 emailsSent++;
-
-                console.log(`Reminder sent to ${issue.studentEmail}`);
-
-            } else {
-
-                console.log(`Failed to send reminder to ${issue.studentEmail}`);
 
             }
 
@@ -200,48 +218,12 @@ Library Management System`
 
     } catch (err) {
 
-        console.log("Reminder Error:", err.message);
+        console.log(err);
 
         return {
             total: 0,
             emailsSent: 0
         };
-        const contactSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    message: String,
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-const Contact = mongoose.model("Contact", contactSchema);
-
-async function sendSMS(number, message) {
-
-    try {
-
-        await axios.post(
-            "https://www.fast2sms.com/dev/bulkV2",
-            {
-                route: "q",
-                message,
-                numbers: number
-            },
-            {
-                headers: {
-                    authorization: process.env.FAST2SMS_API_KEY,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        console.log(`SMS sent to ${number}`);
-
-    } catch (err) {
-
-        console.log("SMS Error:", err.message);
 
     }
 
@@ -297,11 +279,11 @@ app.post("/api/signup", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
-            message: "Server Error"
+            message: err.message
         });
 
     }
@@ -345,11 +327,11 @@ app.post("/api/login", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
-            message: "Server Error"
+            message: err.message
         });
 
     }
@@ -384,7 +366,7 @@ app.post("/register-student", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -407,7 +389,7 @@ app.get("/students-data", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -442,7 +424,7 @@ app.delete("/delete-student/:id", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -481,7 +463,7 @@ app.post("/register-book", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -504,7 +486,7 @@ app.get("/books-data", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -514,7 +496,8 @@ app.get("/books-data", async (req, res) => {
     }
 
 });
-        app.put("/update-book/:id", async (req, res) => {
+
+app.put("/update-book/:id", async (req, res) => {
 
     try {
 
@@ -555,7 +538,7 @@ app.get("/books-data", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -588,7 +571,7 @@ app.delete("/delete-book/:id", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -598,7 +581,6 @@ app.delete("/delete-book/:id", async (req, res) => {
     }
 
 });
-
 app.post("/issue-book", async (req, res) => {
 
     try {
@@ -608,27 +590,29 @@ app.post("/issue-book", async (req, res) => {
         });
 
         if (!book) {
-
             return res.status(404).json({
                 success: false,
                 message: "Book not found"
             });
-
         }
 
         if (book.available <= 0) {
-
             return res.status(400).json({
                 success: false,
                 message: "Book not available"
             });
-
         }
 
         const issue = new Issue({
-            ...req.body,
-            reminderSent: false,
-            status: "Issued"
+            studentId: req.body.studentId,
+            studentName: req.body.studentName,
+            studentEmail: req.body.studentEmail,
+            bookId: req.body.bookId,
+            bookTitle: req.body.bookTitle,
+            issueDate: req.body.issueDate,
+            dueDate: req.body.dueDate,
+            status: "Issued",
+            reminderSent: false
         });
 
         await issue.save();
@@ -644,7 +628,7 @@ app.post("/issue-book", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -659,7 +643,9 @@ app.get("/issued-books", async (req, res) => {
 
     try {
 
-        const issues = await Issue.find().sort({
+        const issues = await Issue.find({
+            status: "Issued"
+        }).sort({
             issueDate: -1
         });
 
@@ -667,7 +653,7 @@ app.get("/issued-books", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -697,7 +683,50 @@ app.get("/issue/:id", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+});
+
+app.put("/update-issue/:id", async (req, res) => {
+
+    try {
+
+        const issue = await Issue.findById(req.params.id);
+
+        if (!issue) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Issue not found"
+            });
+
+        }
+
+        issue.studentId = req.body.studentId;
+        issue.studentName = req.body.studentName;
+        issue.studentEmail = req.body.studentEmail;
+        issue.bookId = req.body.bookId;
+        issue.bookTitle = req.body.bookTitle;
+        issue.issueDate = req.body.issueDate;
+        issue.dueDate = req.body.dueDate;
+
+        await issue.save();
+
+        res.json({
+            success: true,
+            message: "Issue updated successfully"
+        });
+
+    } catch (err) {
+
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -748,7 +777,7 @@ app.put("/return-book/:id", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -773,7 +802,7 @@ app.get("/returned-books", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -824,7 +853,7 @@ app.delete("/delete-issue/:id", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
             success: false,
@@ -834,54 +863,45 @@ app.delete("/delete-issue/:id", async (req, res) => {
     }
 
 });
-
-app.put("/update-issue/:id", async (req, res) => {
+async function sendSMS(number, message) {
 
     try {
 
-        const issue = await Issue.findById(req.params.id);
+        await axios.post(
+            "https://www.fast2sms.com/dev/bulkV2",
+            {
+                route: "q",
+                message,
+                numbers: number
+            },
+            {
+                headers: {
+                    authorization: process.env.FAST2SMS_API_KEY,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
-        if (!issue) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Issue not found"
-            });
-
-        }
-
-        issue.studentId = req.body.studentId;
-        issue.studentName = req.body.studentName;
-        issue.studentEmail = req.body.studentEmail;
-        issue.bookId = req.body.bookId;
-        issue.bookTitle = req.body.bookTitle;
-        issue.issueDate = req.body.issueDate;
-        issue.dueDate = req.body.dueDate;
-
-        await issue.save();
-
-        res.json({
-            success: true,
-            message: "Issue updated successfully"
-        });
+        console.log(`SMS sent to ${number}`);
 
     } catch (err) {
 
-        console.log(err.message);
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
+        console.log(err.response?.data || err.message);
 
     }
 
-});
-        app.get("/check-env", (req, res) => {
+}
+
+app.get("/check-env", (req, res) => {
 
     res.json({
+
         EMAIL_USER: process.env.EMAIL_USER,
-        BREVO_API_KEY_EXISTS: !!process.env.BREVO_API_KEY
+
+        BREVO_API_KEY_EXISTS: !!process.env.BREVO_API_KEY,
+
+        SESSION_SECRET_EXISTS: !!process.env.SESSION_SECRET
+
     });
 
 });
@@ -893,7 +913,9 @@ app.post("/contact", async (req, res) => {
         const contact = new Contact({
 
             name: req.body.name,
+
             email: req.body.email,
+
             message: req.body.message
 
         });
@@ -903,17 +925,19 @@ app.post("/contact", async (req, res) => {
         res.json({
 
             success: true,
+
             message: "Message sent successfully"
 
         });
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
 
             success: false,
+
             message: err.message
 
         });
@@ -955,39 +979,30 @@ app.get("/dashboard-data", async (req, res) => {
         res.json({
 
             totalBooks,
+
             totalStudents,
+
             issuedBooks,
+
             returnedBooks,
+
             availableBooks
 
         });
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
 
         res.status(500).json({
 
             success: false,
+
             message: err.message
 
         });
 
     }
-
-});
-
-app.get("/test-sms", async (req, res) => {
-
-    await sendSMS(
-
-        "YOUR_MOBILE_NUMBER",
-
-        "Library reminder: Your book due date is near."
-
-    );
-
-    res.send("SMS sent");
 
 });
 
@@ -1011,7 +1026,79 @@ app.get("/send-reminders", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err.message);
+        console.log(err);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+});
+
+app.get("/test-reminder", async (req, res) => {
+
+    try {
+
+        const result = await sendDueDateReminder();
+
+        res.json({
+
+            success: true,
+
+            result
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+});
+
+app.get("/reset-reminders", async (req, res) => {
+
+    try {
+
+        const result = await Issue.updateMany(
+
+            {},
+
+            {
+
+                $set: {
+
+                    reminderSent: false
+
+                }
+
+            }
+
+        );
+
+        res.json({
+
+            success: true,
+
+            modified: result.modifiedCount
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
 
         res.status(500).json({
 
@@ -1042,7 +1129,9 @@ cron.schedule(
         const result = await sendDueDateReminder();
 
         console.log(
+
             `Reminder Job Completed | Total: ${result.total} | Emails Sent: ${result.emailsSent}`
+
         );
 
     },
@@ -1064,112 +1153,3 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 
 });
-        app.put("/return-book/:id", async (req, res) => {
-
-    try {
-
-        const issue = await Issue.findById(req.params.id);
-
-        if (!issue) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Issue not found"
-            });
-
-        }
-
-        issue.returnDate = req.body.returnDate;
-        issue.fine = req.body.fine;
-        issue.status = "Returned";
-        issue.reminderSent = false;
-
-        await issue.save();
-
-        const book = await Book.findOne({
-            bookId: issue.bookId
-        });
-
-        if (book) {
-
-            book.available++;
-
-            await book.save();
-
-        }
-
-        res.json({
-            success: true,
-            message: "Book returned successfully"
-        });
-
-    } catch (err) {
-
-        console.log(err.message);
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
-});
-
-app.get("/reset-reminders", async (req, res) => {
-
-    try {
-
-        const result = await Issue.updateMany(
-            {},
-            {
-                $set: {
-                    reminderSent: false
-                }
-            }
-        );
-
-        res.json({
-            success: true,
-            modified: result.modifiedCount
-        });
-
-    } catch (err) {
-
-        console.log(err.message);
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
-});
-
-app.get("/test-reminder", async (req, res) => {
-
-    try {
-
-        const result = await sendDueDateReminder();
-
-        res.json({
-            success: true,
-            result
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
-});
-        
-
-    }
-
-}
